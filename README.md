@@ -31,7 +31,8 @@ FM FG Godsdeklaration distribueras i enlighet med licensvillkoren i **Apache Lic
 _FM FG Godsdeklaration is distributed according to the terms of the **Apache License version 2.0**._
 
 ## Tillkännagivanden
-[ADR-S 2025](https://www.mcf.se/contentassets/ff5ff478bcdc4cdb81583807013f6cd6/adr-s-2025-spara-andringar.pdf)
+- [ADR-S 2025](https://www.mcf.se/contentassets/ff5ff478bcdc4cdb81583807013f6cd6/adr-s-2025-spara-andringar.pdf)
+- [Transportstyrelsens författningssamling 2022](https://www.transportstyrelsen.se/TSFS/TSFS%202022_52_k.pdf)
 
 FM FG Godsdeklaration använder följande tredjepartsbibliotek och resurser, utöver
 utvecklingsverktyg för Android utgivna av Google:
