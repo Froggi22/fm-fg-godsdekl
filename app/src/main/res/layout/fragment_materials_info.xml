@@ -134,6 +134,28 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
+                            android:text="@string/material_klasskod"/>
+
+                        <TextView
+                            android:id="@+id/material_klasskod"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
                             android:text="@string/material_etiketter"/>
 
                         <TextView

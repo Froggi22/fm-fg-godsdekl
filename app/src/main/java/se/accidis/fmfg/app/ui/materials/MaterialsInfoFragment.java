@@ -88,10 +88,19 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 
 		// Etiketter
 		TextView etiketterView = (TextView) view.findViewById(R.id.material_etiketter);
-		if (!TextUtils.isEmpty(mMaterial.getEtiketterAsString())) {
-			etiketterView.setText(mMaterial.getEtiketterAsString());
+		String etiketter = formatEtiketter(mMaterial.getEtiketter());
+		if (!TextUtils.isEmpty(etiketter)) {
+			etiketterView.setText(etiketter);
 		} else {
 			etiketterView.setText(R.string.material_no_data);
+		}
+
+		// Klasskod
+		TextView klassKodView = (TextView) view.findViewById(R.id.material_klasskod);
+		if (!TextUtils.isEmpty(mMaterial.getKlassKod())) {
+			klassKodView.setText(mMaterial.getKlassKod());
+		} else {
+			klassKodView.setText(R.string.material_no_data);
 		}
 
 		populateOptionalTextRow(view, R.id.material_sarbest_row, R.id.material_sarbest, joinValues(mMaterial.getSarbest()));
@@ -162,6 +171,17 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 			return null;
 		}
 		return TextUtils.join(", ", values);
+	}
+
+	private String formatEtiketter(List<String> etiketter) {
+		if (null == etiketter || etiketter.isEmpty()) {
+			return null;
+		} else if (1 == etiketter.size()) {
+			return etiketter.get(0);
+		}
+
+		List<String> secondaryLabels = etiketter.subList(1, etiketter.size());
+		return String.format("%s (%s)", etiketter.get(0), TextUtils.join(", ", secondaryLabels));
 	}
 
 	private String createReferenceText(String section, String code) {
