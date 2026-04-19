@@ -57,6 +57,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private MaterialsLoadDialogListener mListener;
 	private Material mMaterial;
 	private BigDecimal mMultiplier;
+	private View mNEMHeading;
 	private TextView mNEMView;
 	private int mSelectedFmIndex = -1;
 	private EditText mNumberPkgsField;
@@ -106,6 +107,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mFmRequiredMarker = view.findViewById(R.id.material_load_fm_required);
 		mValueView = (TextView) view.findViewById(R.id.material_load_value);
 		mTotalValueView = (TextView) view.findViewById(R.id.material_load_total_value);
+		mNEMHeading = view.findViewById(R.id.material_load_nem_heading);
 		mNEMView = (TextView) view.findViewById(R.id.material_load_nem);
 		mCustomNEMMode = (null != row && null != row.getCustomNEMmg() && canToggleCustomNEMMode());
 		initializeFmSpinner(view);
@@ -184,10 +186,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		List<Material.FM> fmEntries = mMaterial.getFM();
 
 		if (fmEntries.size() > 1) {
-			if (mCustomNEMMode) {
-				mSelectedFmIndex = -1;
-				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
-			} else if (mSelectedFmIndex < 0 || mSelectedFmIndex >= fmEntries.size()) {
+			if (!mCustomNEMMode && (mSelectedFmIndex < 0 || mSelectedFmIndex >= fmEntries.size())) {
 				mSelectedFmIndex = 0;
 				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
 			}
@@ -226,9 +225,12 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			int initialSelection = (mSelectedFmIndex >= 0 && mSelectedFmIndex < fmEntries.size()) ? mSelectedFmIndex : 0;
 			mFmSpinner.setSelection(initialSelection);
 			mFmSpinner.setOnItemSelectedListener(new FmSelectedListener());
-		} else {
-			if (1 == fmEntries.size()) {
+		} else if (1 == fmEntries.size()) {
+			if (!mCustomNEMMode) {
 				mSelectedFmIndex = 0;
+				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
+			} else {
+				mSelectedFmIndex = -1;
 				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
 			}
 		}
@@ -250,13 +252,14 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			return;
 		}
 		mCustomNEMToggle.setVisibility(View.VISIBLE);
-		mCustomNEMToggle.setChecked(mCustomNEMMode);
+		mCustomNEMToggle.setChecked(!mCustomNEMMode);
 		mCustomNEMToggle.setOnCheckedChangeListener(new CustomNEMModeChangedListener());
 	}
 
 	private void updateNemInputModeVisibility() {
 		boolean showFm = mMaterial.getFM().size() > 1 && !mCustomNEMMode;
-		boolean showCustomNEM = canToggleCustomNEMMode() ? mCustomNEMMode : !mMaterial.hasPresetNEMValue();
+		boolean showNEM = isClass1();
+		boolean showCustomNEM = showNEM && (canToggleCustomNEMMode() ? mCustomNEMMode : !mMaterial.hasPresetNEMValue());
 
 		mFmHeading.setVisibility(showFm ? View.VISIBLE : View.GONE);
 		mFmSpinner.setVisibility(showFm ? View.VISIBLE : View.GONE);
@@ -265,10 +268,13 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mCustomNEMHeading.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
 		mCustomNEMLayout.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
 		mCustomNEMRequiredMarker.setVisibility(showCustomNEM && isClass1() ? View.VISIBLE : View.GONE);
+
+		mNEMHeading.setVisibility(showNEM ? View.VISIBLE : View.GONE);
+		mNEMView.setVisibility(showNEM ? View.VISIBLE : View.GONE);
 	}
 
 	private boolean canToggleCustomNEMMode() {
-		return isClass1() && mMaterial.getFM().size() > 1;
+		return !mMaterial.getFM().isEmpty();
 	}
 
 	private void initializeMiljoCheckbox(DocumentRow row) {
@@ -313,7 +319,9 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	}
 
 	private BigDecimal getActiveNEMPerAmountKg() {
-		if (mCustomNEMMode && null != mCustomNEMkg) {
+		if (!isClass1()) {
+			return null;
+		} else if (mCustomNEMMode && null != mCustomNEMkg) {
 			return mCustomNEMkg;
 		} else if (mMaterial.hasNEM()) {
 			return mMaterial.getNEMkg();
@@ -459,7 +467,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private final class CustomNEMModeChangedListener implements CompoundButton.OnCheckedChangeListener {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-			mCustomNEMMode = isChecked;
+			mCustomNEMMode = !isChecked;
 			if (mCustomNEMMode) {
 				mSelectedFmIndex = -1;
 				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
