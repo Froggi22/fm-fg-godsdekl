@@ -21,7 +21,6 @@ import androidx.fragment.app.DialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import se.accidis.fmfg.app.R;
@@ -74,8 +73,9 @@ public final class CustomRowDialogFragment extends DialogFragment {
 		mSelectedLabelsText = (TextView) view.findViewById(R.id.document_custom_row_labels);
 		refreshSelectedLabelsText();
 
-		final LinearLayout labelLayout = (LinearLayout) view.findViewById(R.id.document_custom_row_labels_layout);
-		populateLabels(labelLayout, inflater);
+		final LinearLayout labelRow1 = (LinearLayout) view.findViewById(R.id.document_custom_row_labels_row1);
+		final LinearLayout labelRow2 = (LinearLayout) view.findViewById(R.id.document_custom_row_labels_row2);
+		populateLabels(labelRow1, labelRow2, inflater);
 
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(view)
@@ -104,10 +104,12 @@ public final class CustomRowDialogFragment extends DialogFragment {
 		return Material.createCustom(text, mSelectedLabels, mOriginalUuid);
 	}
 
-	private void populateLabels(LinearLayout labelLayout, LayoutInflater inflater) {
+	private void populateLabels(LinearLayout labelRow1, LinearLayout labelRow2, LayoutInflater inflater) {
 		final Collection<Label> labels = LabelsRepository.getAllLabels();
+		int index = 0;
 		for (Label label : labels) {
-			final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.layout_item_label, labelLayout, false);
+			final LinearLayout labelRow = (0 == index % 2) ? labelRow1 : labelRow2;
+			final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.layout_item_label, labelRow, false);
 
 			final CheckBox checkBox = (CheckBox) view.findViewById(R.id.label_checkbox);
 			checkBox.setText(label.getEtiketter());
@@ -123,16 +125,24 @@ public final class CustomRowDialogFragment extends DialogFragment {
 					checkBox.setChecked(!checkBox.isChecked());
 				}
 			});
-			labelLayout.addView(view);
+			labelRow.addView(view);
+			index++;
 		}
 	}
 
 	public void refreshSelectedLabelsText() {
 		if (!mSelectedLabels.isEmpty()) {
-			mSelectedLabelsText.setText(TextUtils.join(", ", mSelectedLabels));
+			mSelectedLabelsText.setText(formatSelectedLabels());
 		} else {
 			mSelectedLabelsText.setText("");
 		}
+	}
+
+	private String formatSelectedLabels() {
+		if (1 == mSelectedLabels.size()) {
+			return mSelectedLabels.get(0);
+		}
+		return mSelectedLabels.get(0) + " (" + TextUtils.join(", ", mSelectedLabels.subList(1, mSelectedLabels.size())) + ")";
 	}
 
 	public void setDialogListener(CustomRowDialogListener listener) {
@@ -152,8 +162,9 @@ public final class CustomRowDialogFragment extends DialogFragment {
 
 			final Label label = (Label) compoundButton.getTag();
 			if (checked) {
-				mSelectedLabels.add(label.getEtiketter());
-				Collections.sort(mSelectedLabels);
+				if (!mSelectedLabels.contains(label.getEtiketter())) {
+					mSelectedLabels.add(label.getEtiketter());
+				}
 			} else {
 				mSelectedLabels.remove(label.getEtiketter());
 			}
