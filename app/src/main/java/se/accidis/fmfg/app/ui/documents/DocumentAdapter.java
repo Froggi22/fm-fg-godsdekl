@@ -1,7 +1,12 @@
 package se.accidis.fmfg.app.ui.documents;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -223,13 +228,13 @@ public final class DocumentAdapter extends BaseAdapter {
 		TextView nemView = (TextView) view.findViewById(R.id.document_summary_nem);
 		BigDecimal documentNEM = mDocument.getTotalNEMkg();
 		if (0.0 != documentNEM.doubleValue()) {
-			nemView.setText(String.format(mContext.getString(R.string.document_summary_total_nem_format), ValueHelper.formatValue(documentNEM)));
+			nemView.setText(formatSummaryLine(String.format(mContext.getString(R.string.document_summary_total_nem_format), ValueHelper.formatValue(documentNEM))));
 			nemView.setVisibility(View.VISIBLE);
 		} else {
 			nemView.setVisibility(View.GONE);
 		}
 
-		StringBuilder valueBuilder = new StringBuilder();
+		SpannableStringBuilder valueBuilder = new SpannableStringBuilder();
 		for (int tpKat = Material.TPKAT_MIN; tpKat <= Material.TPKAT_MAX; tpKat++) {
 			BigDecimal valueByTpKat = mDocument.getCalculatedValueByTpKat(tpKat);
 			String weightVolumeByTpKat = mDocument.getWeightVolumeStringByTpKat(tpKat, mContext);
@@ -237,13 +242,13 @@ public final class DocumentAdapter extends BaseAdapter {
 				if (0 != valueBuilder.length()) {
 					valueBuilder.append(AndroidUtils.LINE_SEPARATOR);
 				}
-				valueBuilder.append(String.format(mContext.getString(R.string.document_summary_tpkat_format), tpKat, weightVolumeByTpKat, ValueHelper.formatValue(valueByTpKat)));
+				valueBuilder.append(formatSummaryLine(String.format(mContext.getString(R.string.document_summary_tpkat_format), tpKat, weightVolumeByTpKat, ValueHelper.formatValue(valueByTpKat))));
 			}
 		}
 
 		TextView totalByTpKatView = (TextView) view.findViewById(R.id.document_summary_tpkat);
 		if (0 != valueBuilder.length()) {
-			totalByTpKatView.setText(valueBuilder.toString());
+			totalByTpKatView.setText(valueBuilder);
 			totalByTpKatView.setVisibility(View.VISIBLE);
 		} else {
 			totalByTpKatView.setVisibility(View.GONE);
@@ -251,13 +256,25 @@ public final class DocumentAdapter extends BaseAdapter {
 
 		BigDecimal totalValue = mDocument.getCalculatedTotalValue();
 		TextView totalView = (TextView) view.findViewById(R.id.document_summary_total);
-		totalView.setText(String.format(mContext.getString(R.string.document_summary_total_format), ValueHelper.formatValue(totalValue)));
+		totalView.setText(formatSummaryLine(String.format(mContext.getString(R.string.document_summary_total_format), ValueHelper.formatValue(totalValue))));
 
 		boolean isViolatingColoadingRules = ColoadingHelper.isViolationOfColoadingRules(mDocument);
 		View warningClass1View = view.findViewById(R.id.document_warning_class1);
 		warningClass1View.setVisibility(isViolatingColoadingRules ? View.VISIBLE : View.GONE);
 
 		return view;
+	}
+
+	private SpannableString formatSummaryLine(String text) {
+		SpannableString result = new SpannableString(text);
+		int prefixEnd = text.indexOf(':') + 1;
+		if (prefixEnd > 0) {
+			if (prefixEnd < text.length() && text.charAt(prefixEnd) == ' ') {
+				prefixEnd++;
+			}
+			result.setSpan(new StyleSpan(Typeface.BOLD), 0, prefixEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+		}
+		return result;
 	}
 
 	private View getRowView(int rowIndex, View convertView, ViewGroup parent) {

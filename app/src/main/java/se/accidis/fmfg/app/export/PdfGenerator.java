@@ -8,7 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.pdfjet.A4;
+import com.pdfjet.Border;
 import com.pdfjet.Cell;
+import com.pdfjet.CompositeTextLine;
 import com.pdfjet.CoreFont;
 import com.pdfjet.Font;
 import com.pdfjet.Image;
@@ -57,6 +59,7 @@ public final class PdfGenerator {
 	private static final float ADDRESS_BLOCK_WIDTH = CONTENT_WIDTH / 2.0f - INNER_MARGIN;
 	private static final float LABEL_SIZE = CONTENT_WIDTH / LABELS_PER_ROW - INNER_MARGIN;
 	private static final float ROW_BOTTOM_PADDING = 8.0f;
+	private static final float SUMMARY_SEPARATOR_LINE_WIDTH = 0.5f;
 	private static final float SIGNATURE_BLOCK_HEIGHT = 32.0f;
 	private static final float TABLE_TOP_MARGIN = 8.0f;
 	private final static String TAG = PdfGenerator.class.getSimpleName();
@@ -66,6 +69,8 @@ public final class PdfGenerator {
 	private final Font mLabelFont;
 	private final PDF mPdf;
 	private final Preferences mPrefs;
+	private final List<Cell> mSummarySeparatorCells = new ArrayList<>(3);
+	private final Font mTextBoldFont;
 	private final Font mTextFont;
 	private final Font mVanityFont;
 
@@ -80,6 +85,9 @@ public final class PdfGenerator {
 
 		mTextFont = new Font(mPdf, CoreFont.TIMES_ROMAN);
 		mTextFont.setSize(10.0f);
+
+		mTextBoldFont = new Font(mPdf, CoreFont.TIMES_BOLD);
+		mTextBoldFont.setSize(10.0f);
 
 		mVanityFont = new Font(mPdf, CoreFont.TIMES_ROMAN);
 		mVanityFont.setSize(5.0f);
@@ -173,13 +181,16 @@ public final class PdfGenerator {
 	}
 
 	private void createSummaryRows(List<List<Cell>> rows) {
-		Cell emptyCell = new Cell(mTextFont, EMPTY_STR);
-		rows.add(Arrays.asList(emptyCell, emptyCell, emptyCell));
+		Cell emptyCell = createEmptyCell();
+		mSummarySeparatorCells.clear();
+		mSummarySeparatorCells.add(createSummarySeparatorCell());
+		mSummarySeparatorCells.add(createSummarySeparatorCell());
+		mSummarySeparatorCells.add(createSummarySeparatorCell());
+		rows.add(mSummarySeparatorCells);
 
 		BigDecimal documentNEM = mDocument.getTotalNEMkg();
 		if (0.0 != documentNEM.doubleValue()) {
-			Cell nemCell = new Cell(mTextFont, String.format(mContext.getString(R.string.document_summary_total_nem_format), ValueHelper.formatValue(documentNEM)));
-			nemCell.setLeftPadding(0);
+			Cell nemCell = createSummaryCell(String.format(mContext.getString(R.string.document_summary_total_nem_format), ValueHelper.formatValue(documentNEM)));
 			rows.add(Arrays.asList(nemCell, emptyCell, emptyCell));
 		}
 
@@ -187,25 +198,58 @@ public final class PdfGenerator {
 			BigDecimal valueByTpKat = mDocument.getCalculatedValueByTpKat(tpKat);
 			String weightVolumeByTpKat = mDocument.getWeightVolumeStringByTpKat(tpKat, mContext);
 			if (!TextUtils.isEmpty(weightVolumeByTpKat)) {
-				Cell valueCell = new Cell(mTextFont, String.format(mContext.getString(R.string.document_summary_tpkat_format), tpKat, weightVolumeByTpKat, ValueHelper.formatValue(valueByTpKat)));
-				valueCell.setLeftPadding(0);
+				Cell valueCell = createSummaryCell(String.format(mContext.getString(R.string.document_summary_tpkat_format), tpKat, weightVolumeByTpKat, ValueHelper.formatValue(valueByTpKat)));
 				rows.add(Arrays.asList(valueCell, emptyCell, emptyCell));
 			}
 		}
 
 		BigDecimal totalValue = mDocument.getCalculatedTotalValue();
-		Cell totalCell = new Cell(mTextFont, String.format(mContext.getString(R.string.document_summary_total_format), ValueHelper.formatValue(totalValue)));
-		totalCell.setLeftPadding(0);
+		Cell totalCell = createSummaryCell(String.format(mContext.getString(R.string.document_summary_total_format), ValueHelper.formatValue(totalValue)));
 		rows.add(Arrays.asList(totalCell, emptyCell, emptyCell));
+	}
+
+	private Cell createSummaryCell(String text) {
+		int prefixEnd = text.indexOf(':') + 1;
+		if (prefixEnd > 0 && prefixEnd < text.length() && text.charAt(prefixEnd) == ' ') {
+			prefixEnd++;
+		}
+
+		CompositeTextLine line = new CompositeTextLine(0.0f, 0.0f);
+		if (prefixEnd > 0) {
+			TextLine labelLine = new TextLine(mTextBoldFont, text.substring(0, prefixEnd));
+			labelLine.setTrailingSpace(true);
+			line.addComponent(labelLine);
+			line.addComponent(new TextLine(mTextFont, text.substring(prefixEnd)));
+		} else {
+			line.addComponent(new TextLine(mTextFont, text));
+		}
+
+		Cell cell = new Cell(mTextFont);
+		cell.setCompositeTextLine(line);
+		cell.setLeftPadding(0);
+		return cell;
+	}
+
+	private Cell createEmptyCell() {
+		return new Cell(mTextFont, EMPTY_STR);
+	}
+
+	private Cell createSummarySeparatorCell() {
+		Cell cell = createEmptyCell();
+		cell.setTopPadding(INNER_MARGIN);
+		cell.setLineWidth(SUMMARY_SEPARATOR_LINE_WIDTH);
+		return cell;
 	}
 
 	@NonNull
 	private Table createTable(float headerBottom, float footerHeight) throws Exception {
 		Table table = new Table();
-		table.setData(createTableData(), Table.DATA_HAS_1_HEADER_ROWS);
+		List<List<Cell>> tableData = createTableData();
+		table.setData(tableData, Table.DATA_HAS_1_HEADER_ROWS);
 		table.setLocation(HORIZONTAL_MARGIN, headerBottom + INNER_MARGIN);
 		table.setBottomMargin(VERTICAL_MARGIN + footerHeight);
 		table.setNoCellBorders();
+		addSummarySeparatorLine();
 
 		table.setColumnWidth(0, CONTENT_WIDTH * 0.7f);
 		table.setColumnWidth(1, CONTENT_WIDTH * 0.15f);
@@ -213,6 +257,12 @@ public final class PdfGenerator {
 		table.wrapAroundCellText();
 
 		return table;
+	}
+
+	private void addSummarySeparatorLine() {
+		for (Cell cell : mSummarySeparatorCells) {
+			cell.setBorder(Border.TOP, true);
+		}
 	}
 
 	private List<List<Cell>> createTableData() throws Exception {
