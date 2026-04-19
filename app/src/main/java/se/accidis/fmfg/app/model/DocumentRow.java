@@ -23,6 +23,7 @@ public final class DocumentRow {
 	private BigDecimal mMultiplier;
 	private BigDecimal mAmount; // Antal enheter för beräkning av NEM
 	private BigDecimal mCustomNEMmg; // Användardefinierad NEM i mg
+	private String mCustomNEMUnit; // Enhet för användardefinierad NEM
 	private Boolean mMiljoOverride; // Användardefinierad Miljo
 	private boolean mIsVolume; // Huruvida kvantitet är angiven i liter
 	private int mNumberOfPkgs; // Antal kolli
@@ -33,6 +34,7 @@ public final class DocumentRow {
 		mId = UUID.randomUUID();
 		mAmount = BigDecimal.ZERO;
 		mCustomNEMmg = null;
+		mCustomNEMUnit = Keys.CUSTOM_NEM_UNIT_AMOUNT;
 		mMiljoOverride = null;
 		mMaterial = material;
 		mMultiplier = new BigDecimal(ValueHelper.getMultiplierByTpKat(mMaterial.getTpKat()));
@@ -66,6 +68,7 @@ public final class DocumentRow {
 				}
 			}
 		}
+		row.mCustomNEMUnit = sanitizeCustomNEMUnit(json.optString(Keys.CUSTOM_NEM_UNIT, Keys.CUSTOM_NEM_UNIT_AMOUNT));
 		return row;
 	}
 
@@ -73,6 +76,7 @@ public final class DocumentRow {
 		other.setMaterial(mMaterial);
 		other.mAmount = mAmount;
 		other.mCustomNEMmg = mCustomNEMmg;
+		other.mCustomNEMUnit = mCustomNEMUnit;
 		other.mMiljoOverride = mMiljoOverride;
 		other.mIsVolume = mIsVolume;
 		other.mNumberOfPkgs = mNumberOfPkgs;
@@ -111,16 +115,16 @@ public final class DocumentRow {
 		mMultiplier = new BigDecimal(ValueHelper.getMultiplierByTpKat(mMaterial.getTpKat()));
 		if (mMaterial.hasPresetNEMValue() || mMaterial.hasNEM()) {
 			mCustomNEMmg = null;
+			mCustomNEMUnit = Keys.CUSTOM_NEM_UNIT_AMOUNT;
 		}
 	}
 
 	public BigDecimal getNEMkg() {
-		BigDecimal nemPerAmount = getNemPerAmountKg();
-		if (null == nemPerAmount) {
+		BigDecimal nemPerUnit = getNemPerUnitKg();
+		if (null == nemPerUnit) {
 			return BigDecimal.ZERO;
 		}
-		BigDecimal amount = (null != mAmount) ? mAmount : BigDecimal.ZERO;
-		return nemPerAmount.multiply(amount);
+		return nemPerUnit.multiply(getNEMMultiplier());
 	}
 
 	public BigDecimal getCustomNEMmg() {
@@ -132,7 +136,16 @@ public final class DocumentRow {
 			mCustomNEMmg = customNEMmg;
 		} else {
 			mCustomNEMmg = null;
+			mCustomNEMUnit = Keys.CUSTOM_NEM_UNIT_AMOUNT;
 		}
+	}
+
+	public boolean isCustomNEMPerPackage() {
+		return Keys.CUSTOM_NEM_UNIT_PACKAGE.equals(mCustomNEMUnit);
+	}
+
+	public void setCustomNEMPerPackage(boolean customNEMPerPackage) {
+		mCustomNEMUnit = customNEMPerPackage ? Keys.CUSTOM_NEM_UNIT_PACKAGE : Keys.CUSTOM_NEM_UNIT_AMOUNT;
 	}
 
 	public int getNumberOfPackages() {
@@ -222,6 +235,7 @@ public final class DocumentRow {
 		json.put(Keys.WEIGHT_VOLUME, mWeightVolume.toString());
 		if (null != mCustomNEMmg) {
 			json.put(Keys.CUSTOM_NEM_MG, mCustomNEMmg.toPlainString());
+			json.put(Keys.CUSTOM_NEM_UNIT, mCustomNEMUnit);
 		}
 		if (null != mMiljoOverride) {
 			json.put(Keys.MILJO_OVERRIDE, mMiljoOverride);
@@ -229,7 +243,7 @@ public final class DocumentRow {
 		return json;
 	}
 
-	private BigDecimal getNemPerAmountKg() {
+	private BigDecimal getNemPerUnitKg() {
 		if (mMaterial.hasNEM()) {
 			return mMaterial.getNEMkg();
 		} else if (null != mCustomNEMmg) {
@@ -238,9 +252,23 @@ public final class DocumentRow {
 		return null;
 	}
 
+	private BigDecimal getNEMMultiplier() {
+		if (!mMaterial.hasNEM() && null != mCustomNEMmg && isCustomNEMPerPackage()) {
+			return new BigDecimal(mNumberOfPkgs);
+		}
+		return (null != mAmount) ? mAmount : BigDecimal.ZERO;
+	}
+
+	private static String sanitizeCustomNEMUnit(String value) {
+		return Keys.CUSTOM_NEM_UNIT_PACKAGE.equals(value) ? Keys.CUSTOM_NEM_UNIT_PACKAGE : Keys.CUSTOM_NEM_UNIT_AMOUNT;
+	}
+
 	public static class Keys {
 		public static final String AMOUNT = "Amount";
 		public static final String CUSTOM_NEM_MG = "CustomNEMmg";
+		public static final String CUSTOM_NEM_UNIT = "CustomNEMUnit";
+		public static final String CUSTOM_NEM_UNIT_AMOUNT = "amount";
+		public static final String CUSTOM_NEM_UNIT_PACKAGE = "package";
 		public static final String ID = "RowId";
 		public static final String IS_VOLUME = "IsVolume";
 		public static final String NUMBER_OF_PKGS = "NumberOfPkgs";

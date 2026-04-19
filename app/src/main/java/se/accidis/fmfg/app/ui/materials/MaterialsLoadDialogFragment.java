@@ -16,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -49,8 +50,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private View mCustomNEMLayout;
 	private View mCustomNEMRequiredMarker;
 	private SwitchCompat mCustomNEMToggle;
+	private RadioGroup mCustomNEMUnitGroup;
 	private BigDecimal mCustomNEMkg;
 	private boolean mCustomNEMMode;
+	private boolean mCustomNEMPerPackage;
 	private BigDecimal mDocumentTotalValue;
 	private View mFmHeading;
 	private View mFmRequiredMarker;
@@ -62,6 +65,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private View mNEMHeading;
 	private TextView mNEMView;
 	private int mSelectedFmIndex = -1;
+	private int mNumberOfPackages;
 	private EditText mNumberPkgsField;
 	private DocumentsRepository mRepository;
 	private UUID mEditingRowId;
@@ -107,6 +111,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mCustomNEMLayout = view.findViewById(R.id.material_load_custom_nem_layout);
 		mCustomNEMRequiredMarker = view.findViewById(R.id.material_load_custom_nem_required);
 		mCustomNEMToggle = (SwitchCompat) view.findViewById(R.id.material_load_custom_nem_toggle);
+		mCustomNEMUnitGroup = (RadioGroup) view.findViewById(R.id.material_load_custom_nem_unit);
 		mFmHeading = view.findViewById(R.id.material_load_fm_heading);
 		mFmRequiredMarker = view.findViewById(R.id.material_load_fm_required);
 		mValueView = (TextView) view.findViewById(R.id.material_load_value);
@@ -116,6 +121,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mCustomNEMMode = (null != row && null != row.getCustomNEMmg() && canToggleCustomNEMMode());
 		initializeFmSpinner(view);
 		initializeCustomNEMInput(row);
+		initializeCustomNEMUnit(row);
 		initializeCustomNEMToggle();
 		TextView multiplierView = (TextView) view.findViewById(R.id.material_load_multiplier);
 		multiplierView.setText(String.valueOf(multiplier));
@@ -139,6 +145,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mAmountRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
 
 		mNumberPkgsField = (EditText) view.findViewById(R.id.material_load_number_pkgs);
+		mNumberPkgsField.addTextChangedListener(new NumberOfPackagesChangedListener());
 		mTypePkgsField = (AutoCompleteTextView) view.findViewById(R.id.material_load_type_pkgs);
 		ArrayAdapter<String> typePkgsAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.material_pkg_types));
 		mTypePkgsField.setThreshold(1);
@@ -147,6 +154,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		EditText weightVolumeField = (EditText) view.findViewById(R.id.material_load_weight_volume);
 		weightVolumeField.addTextChangedListener(new WeightVolumeChangedListener());
 		if (null != row) {
+			mNumberOfPackages = row.getNumberOfPackages();
 			mNumberPkgsField.setText(String.valueOf(row.getNumberOfPackages()));
 			mTypePkgsField.setText(row.getTypeOfPackages());
 			weightVolumeField.setText(row.getWeightVolume().toString());
@@ -269,6 +277,13 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		updateNemInputModeVisibility();
 	}
 
+	private void initializeCustomNEMUnit(DocumentRow row) {
+		mCustomNEMPerPackage = (null != row && row.isCustomNEMPerPackage());
+		mCustomNEMUnitGroup.check(mCustomNEMPerPackage ? R.id.material_load_custom_nem_unit_package : R.id.material_load_custom_nem_unit_amount);
+		mCustomNEMUnitGroup.setOnCheckedChangeListener(new CustomNEMUnitChangedListener());
+		updateNemInputModeVisibility();
+	}
+
 	private void initializeCustomNEMToggle() {
 		if (!canToggleCustomNEMMode()) {
 			mCustomNEMToggle.setVisibility(View.GONE);
@@ -290,6 +305,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 		mCustomNEMHeading.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
 		mCustomNEMLayout.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
+		mCustomNEMUnitGroup.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
 		mCustomNEMRequiredMarker.setVisibility(showCustomNEM && isClass1() ? View.VISIBLE : View.GONE);
 
 		mNEMHeading.setVisibility(showNEM ? View.VISIBLE : View.GONE);
@@ -325,9 +341,9 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		}
 
 		BigDecimal value;
-		BigDecimal nemPerAmount = getActiveNEMPerAmountKg();
-		if (null != nemPerAmount) {
-			value = nemPerAmount.multiply(mAmount);
+		BigDecimal nemPerUnit = getActiveNEMPerUnitKg();
+		if (null != nemPerUnit) {
+			value = nemPerUnit.multiply(getActiveNEMMultiplier());
 			mNEMView.setText(String.format(getString(R.string.unit_kg_format), ValueHelper.formatValue(value)));
 		} else {
 			value = mWeightVolume;
@@ -341,7 +357,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mTotalValueView.setText(String.format(getString(R.string.unit_points_format), ValueHelper.formatValue(value.add(mDocumentTotalValue))));
 	}
 
-	private BigDecimal getActiveNEMPerAmountKg() {
+	private BigDecimal getActiveNEMPerUnitKg() {
 		if (!isClass1()) {
 			return null;
 		} else if (mCustomNEMMode && null != mCustomNEMkg) {
@@ -352,6 +368,17 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			return mCustomNEMkg;
 		}
 		return null;
+	}
+
+	private BigDecimal getActiveNEMMultiplier() {
+		if (usesCustomNEMValue() && mCustomNEMPerPackage) {
+			return new BigDecimal(mNumberOfPackages);
+		}
+		return mAmount;
+	}
+
+	private boolean usesCustomNEMValue() {
+		return isClass1() && null != mCustomNEMkg && (mCustomNEMMode || !mMaterial.hasPresetNEMValue());
 	}
 
 	private boolean isClass1() {
@@ -397,6 +424,30 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		}
 	}
 
+	private final class NumberOfPackagesChangedListener implements TextWatcher {
+		@Override
+		public void afterTextChanged(Editable s) {
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+			mNumberOfPackages = parseIntOrZero(s.toString());
+			calculate();
+		}
+
+		private int parseIntOrZero(String str) {
+			try {
+				return Integer.parseInt(str);
+			} catch (NumberFormatException ignored) {
+				return 0;
+			}
+		}
+	}
+
 	private final class RemoveClickedListener implements DialogInterface.OnClickListener {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
@@ -420,6 +471,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			row.setAmount(mAmount);
 			BigDecimal customNEMmg = (isClass1() && (mCustomNEMMode || !mMaterial.hasPresetNEMValue())) ? convertKgToMg(mCustomNEMkg) : null;
 			row.setCustomNEMmg(customNEMmg);
+			row.setCustomNEMPerPackage(mCustomNEMPerPackage);
 			row.setWeightVolume(mWeightVolume);
 			row.setIsVolume(mWeightVolumeIsVolume);
 			if (null != mMiljoCheckbox && mMiljoCheckbox.getVisibility() == View.VISIBLE) {
@@ -487,6 +539,14 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 			BigDecimal parsed = ValueHelper.parseValue(s.toString());
 			mCustomNEMkg = (parsed.compareTo(BigDecimal.ZERO) > 0) ? parsed : null;
+			calculate();
+		}
+	}
+
+	private final class CustomNEMUnitChangedListener implements RadioGroup.OnCheckedChangeListener {
+		@Override
+		public void onCheckedChanged(RadioGroup group, int checkedId) {
+			mCustomNEMPerPackage = (R.id.material_load_custom_nem_unit_package == checkedId);
 			calculate();
 		}
 	}

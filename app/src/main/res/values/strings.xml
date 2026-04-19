@@ -120,7 +120,9 @@
 	<string name="material_load_type_pkgs">Typ av kollin:</string>
 	<string name="material_load_value">Värde:</string>
 	<string name="material_load_weight_volume">Vikt/volym:</string>
-	<string name="material_load_nem_custom">NEM per styck:</string>
+	<string name="material_load_nem_custom">Egen NEM:</string>
+	<string name="material_load_custom_nem_unit_amount">per styck</string>
+	<string name="material_load_custom_nem_unit_package">per kolli</string>
 	<string name="material_load_custom_nem_toggle">Nyttja FM mtrl</string>
 	<string name="material_load_miljo">Miljöfarligt</string>
 	<string name="material_load_fm">FM:</string>
