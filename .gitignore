@@ -1,9 +1,10 @@
 build
 captures
 
-.idea
+.dev/
+.idea/
 *.iml
-.gradle
+.gradle/
 
 fg-godsdekl.keystore
 local.properties
