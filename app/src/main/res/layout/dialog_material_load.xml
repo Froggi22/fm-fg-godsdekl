@@ -220,6 +220,7 @@
 				android:id="@+id/material_load_custom_nem"
 				android:layout_width="80dp"
 				android:layout_height="wrap_content"
+				android:digits="0123456789,."
 				android:inputType="numberDecimal"
 				android:maxLength="16" />
 
