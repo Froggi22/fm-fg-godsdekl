@@ -185,8 +185,8 @@ public final class PdfGenerator {
 
 		for (int tpKat = Material.TPKAT_MIN; tpKat <= Material.TPKAT_MAX; tpKat++) {
 			BigDecimal valueByTpKat = mDocument.getCalculatedValueByTpKat(tpKat);
-			if (0.0 != valueByTpKat.doubleValue()) {
-				String weightVolumeByTpKat = mDocument.getWeightVolumeStringByTpKat(tpKat, mContext);
+			String weightVolumeByTpKat = mDocument.getWeightVolumeStringByTpKat(tpKat, mContext);
+			if (!TextUtils.isEmpty(weightVolumeByTpKat)) {
 				Cell valueCell = new Cell(mTextFont, String.format(mContext.getString(R.string.document_summary_tpkat_format), tpKat, weightVolumeByTpKat, ValueHelper.formatValue(valueByTpKat)));
 				valueCell.setLeftPadding(0);
 				rows.add(Arrays.asList(valueCell, emptyCell, emptyCell));
