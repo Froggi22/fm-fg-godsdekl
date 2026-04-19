@@ -75,6 +75,19 @@ public final class Document {
 		}
 	}
 
+	public void addRow(DocumentRow row) {
+		mRows.add(row);
+	}
+
+	public void updateRow(UUID rowId, DocumentRow row) {
+		DocumentRow existing = getRowById(rowId);
+		if (null != existing) {
+			row.copyTo(existing);
+		} else {
+			mRows.add(row);
+		}
+	}
+
 	public void assignNewId() {
 		mId = UUID.randomUUID();
 	}
@@ -136,6 +149,18 @@ public final class Document {
 	public DocumentRow getRowByMaterial(Material material) {
 		for (DocumentRow row : mRows) {
 			if (row.getMaterial().equals(material)) {
+				return row;
+			}
+		}
+		return null;
+	}
+
+	public DocumentRow getRowById(UUID rowId) {
+		if (null == rowId) {
+			return null;
+		}
+		for (DocumentRow row : mRows) {
+			if (rowId.equals(row.getId())) {
 				return row;
 			}
 		}
@@ -249,6 +274,21 @@ public final class Document {
 		DocumentRow row = getRowByMaterial(material);
 		if (null != row) {
 			mRows.remove(row);
+		}
+	}
+
+	public void removeRowById(UUID rowId) {
+		DocumentRow row = getRowById(rowId);
+		if (null != row) {
+			mRows.remove(row);
+		}
+	}
+
+	public void removeRowsByMaterial(Material material) {
+		for (int i = mRows.size() - 1; i >= 0; i--) {
+			if (mRows.get(i).getMaterial().equals(material)) {
+				mRows.remove(i);
+			}
 		}
 	}
 

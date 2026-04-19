@@ -100,10 +100,13 @@
     <string name="material_frpgrp">Förpackningsgrupp</string>
     <string name="material_etiketter">Etiketter</string>
     <string name="material_load">Lasta</string>
+    <string name="material_load_new">Lasta ny</string>
     <string name="material_tpben">Transportbenämning</string>
     <string name="material_nem_kg_format">NEM %1$s kg</string>
     <string name="material_no_data">-</string>
     <string name="material_remove">Ta bort</string>
+    <string name="material_remove_confirm_title">Ta bort gods?</string>
+    <string name="material_remove_confirm_message">Vill du verkligen ta bort godset från godsdeklarationen?</string>
     <string name="material_tunnelkod">Tunnelrestriktionskod</string>
     <string name="material_tpkat">Transportkategori</string>
     <string name="material_unnr">UN-nummer</string>

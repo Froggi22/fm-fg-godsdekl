@@ -1,6 +1,8 @@
 package se.accidis.fmfg.app.ui.materials;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -36,6 +38,7 @@ import se.accidis.fmfg.app.ui.MainActivity;
  * Fragment showing information about a material.
  */
 public final class MaterialsInfoFragment extends Fragment implements MainActivity.HasNavigationItem {
+	private Button mChangeButton;
 	private Button mLoadButton;
 	private Material mMaterial;
 	private Button mRemoveButton;
@@ -61,10 +64,6 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		Bundle args = getArguments();
 		mMaterial = Material.fromBundle(args);
 		mRepository = DocumentsRepository.getInstance(getContext());
-		DocumentRow existingRow = mRepository.getCurrentDocument().getRowByMaterial(mMaterial);
-		if (null != existingRow) {
-			mMaterial = existingRow.getMaterial();
-		}
 
 		// Transportbenämning
 		TextView tpbenView = (TextView) view.findViewById(R.id.material_tpben);
@@ -129,6 +128,8 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 
 		mLoadButton = (Button) view.findViewById(R.id.material_button_load);
 		mLoadButton.setOnClickListener(new LoadButtonClickListener());
+		mChangeButton = (Button) view.findViewById(R.id.material_button_change);
+		mChangeButton.setOnClickListener(new ChangeButtonClickListener());
 		mRemoveButton = (Button) view.findViewById(R.id.material_button_remove);
 		mRemoveButton.setOnClickListener(new RemoveButtonClickListener());
 		refreshDocumentState();
@@ -160,10 +161,12 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 	private void refreshDocumentState() {
 		DocumentRow row = mRepository.getCurrentDocument().getRowByMaterial(mMaterial);
 		if (null != row) {
-			mLoadButton.setText(R.string.material_change);
+			mLoadButton.setText(R.string.material_load_new);
+			mChangeButton.setVisibility(View.VISIBLE);
 			mRemoveButton.setVisibility(View.VISIBLE);
 		} else {
 			mLoadButton.setText(R.string.material_load);
+			mChangeButton.setVisibility(View.GONE);
 			mRemoveButton.setVisibility(View.GONE);
 		}
 	}
@@ -247,6 +250,21 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		}
 	}
 
+	private final class ChangeButtonClickListener implements View.OnClickListener {
+		@Override
+		public void onClick(View v) {
+			DocumentRow row = mRepository.getCurrentDocument().getRowByMaterial(mMaterial);
+			if (null == row) {
+				return;
+			}
+
+			MaterialsLoadDialogFragment dialog = new MaterialsLoadDialogFragment();
+			dialog.setArguments(MaterialsLoadDialogFragment.createArguments(row.getMaterial(), row));
+			dialog.setDialogListener(new MaterialsLoadDialogListener());
+			dialog.show(getFragmentManager(), MaterialsLoadDialogFragment.class.getSimpleName());
+		}
+	}
+
 	private final class MaterialsLoadDialogListener implements MaterialsLoadDialogFragment.MaterialsLoadDialogListener {
 		@Override
 		public void onDismiss() {
@@ -257,8 +275,20 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 	private final class RemoveButtonClickListener implements View.OnClickListener {
 		@Override
 		public void onClick(View v) {
+			new AlertDialog.Builder(getActivity())
+				.setTitle(R.string.material_remove_confirm_title)
+				.setMessage(R.string.material_remove_confirm_message)
+				.setPositiveButton(R.string.generic_yes, new ConfirmRemoveClickListener())
+				.setNegativeButton(R.string.generic_no, null)
+				.show();
+		}
+	}
+
+	private final class ConfirmRemoveClickListener implements DialogInterface.OnClickListener {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
 			Document document = mRepository.getCurrentDocument();
-			document.removeRowByMaterial(mMaterial);
+			document.removeRowsByMaterial(mMaterial);
 			document.setHasUnsavedChanges(true);
 			mRepository.commitCurrentDocument();
 			refreshDocumentState();

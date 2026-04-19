@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.UUID;
 
 import se.accidis.fmfg.app.R;
 import se.accidis.fmfg.app.model.Document;
@@ -38,6 +39,7 @@ import se.accidis.fmfg.app.utils.AndroidUtils;
  * Fragment for creating/editing a document row (loading materials).
  */
 public final class MaterialsLoadDialogFragment extends DialogFragment {
+	public static final String ARG_ROW_ID = "rowId";
 	private static final BigDecimal MG_PER_KG = new BigDecimal(1000000);
 
 	private BigDecimal mAmount;
@@ -62,6 +64,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private int mSelectedFmIndex = -1;
 	private EditText mNumberPkgsField;
 	private DocumentsRepository mRepository;
+	private UUID mEditingRowId;
 	private TextView mTotalValueView;
 	private AutoCompleteTextView mTypePkgsField;
 	private TextView mValueView;
@@ -78,7 +81,8 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 		mRepository = DocumentsRepository.getInstance(getContext());
 		Document document = mRepository.getCurrentDocument();
-		DocumentRow row = document.getRowByMaterial(mMaterial);
+		mEditingRowId = getRowId(args);
+		DocumentRow row = document.getRowById(mEditingRowId);
 
 		mDocumentTotalValue = document.getCalculatedTotalValue();
 		boolean hasExistingRow = false;
@@ -179,6 +183,25 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 	public void setDialogListener(MaterialsLoadDialogListener listener) {
 		mListener = listener;
+	}
+
+	public static Bundle createArguments(Material material, DocumentRow row) {
+		Bundle args = material.toBundle();
+		if (null != row) {
+			args.putString(ARG_ROW_ID, row.getId().toString());
+		}
+		return args;
+	}
+
+	private UUID getRowId(Bundle args) {
+		if (null == args || !args.containsKey(ARG_ROW_ID)) {
+			return null;
+		}
+		String idValue = args.getString(ARG_ROW_ID);
+		if (null == idValue) {
+			return null;
+		}
+		return UUID.fromString(idValue);
 	}
 
 	private void initializeFmSpinner(View view) {
@@ -378,7 +401,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			Document document = mRepository.getCurrentDocument();
-			document.removeRowByMaterial(mMaterial);
+			document.removeRowById(mEditingRowId);
 			document.setHasUnsavedChanges(true);
 			mRepository.commitCurrentDocument();
 		}
@@ -395,7 +418,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			String typePkgs = mTypePkgsField.getText().toString().trim();
 			row.setTypeOfPackages(typePkgs);
 			row.setAmount(mAmount);
-			BigDecimal customNEMmg = (mCustomNEMMode || !mMaterial.hasPresetNEMValue()) ? convertKgToMg(mCustomNEMkg) : null;
+			BigDecimal customNEMmg = (isClass1() && (mCustomNEMMode || !mMaterial.hasPresetNEMValue())) ? convertKgToMg(mCustomNEMkg) : null;
 			row.setCustomNEMmg(customNEMmg);
 			row.setWeightVolume(mWeightVolume);
 			row.setIsVolume(mWeightVolumeIsVolume);
@@ -406,7 +429,11 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			}
 
 			Document document = mRepository.getCurrentDocument();
-			document.addOrUpdateRow(row);
+			if (null != mEditingRowId) {
+				document.updateRow(mEditingRowId, row);
+			} else {
+				document.addRow(row);
+			}
 			document.setHasUnsavedChanges(true);
 			mRepository.commitCurrentDocument();
 		}

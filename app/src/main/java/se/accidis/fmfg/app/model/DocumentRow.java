@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import se.accidis.fmfg.app.R;
 import se.accidis.fmfg.app.ui.materials.ValueHelper;
@@ -17,6 +18,7 @@ import se.accidis.fmfg.app.ui.materials.ValueHelper;
 public final class DocumentRow {
 	private static final BigDecimal MG_PER_KG = new BigDecimal(1000000);
 
+	private UUID mId;
 	private Material mMaterial;
 	private BigDecimal mMultiplier;
 	private BigDecimal mAmount; // Antal enheter för beräkning av NEM
@@ -28,6 +30,7 @@ public final class DocumentRow {
 	private BigDecimal mWeightVolume; // Kvantitet farligt gods i liter / kg
 
 	public DocumentRow(Material material) {
+		mId = UUID.randomUUID();
 		mAmount = BigDecimal.ZERO;
 		mCustomNEMmg = null;
 		mMiljoOverride = null;
@@ -40,6 +43,10 @@ public final class DocumentRow {
 	public static DocumentRow fromJson(JSONObject json) throws JSONException {
 		Material material = Material.fromJSON(json);
 		DocumentRow row = new DocumentRow(material);
+		String idValue = json.optString(Keys.ID, null);
+		if (!TextUtils.isEmpty(idValue)) {
+			row.mId = UUID.fromString(idValue);
+		}
 		row.mAmount = new BigDecimal(json.getString(Keys.AMOUNT));
 		row.mIsVolume = json.getBoolean(Keys.IS_VOLUME);
 		row.mNumberOfPkgs = json.getInt(Keys.NUMBER_OF_PKGS);
@@ -89,6 +96,10 @@ public final class DocumentRow {
 			value = mWeightVolume;
 		}
 		return value.multiply(mMultiplier);
+	}
+
+	public UUID getId() {
+		return mId;
 	}
 
 	public Material getMaterial() {
@@ -203,6 +214,7 @@ public final class DocumentRow {
 
 	public JSONObject toJson() throws JSONException {
 		JSONObject json = mMaterial.toJson();
+		json.put(Keys.ID, mId.toString());
 		json.put(Keys.AMOUNT, mAmount.toString());
 		json.put(Keys.IS_VOLUME, mIsVolume);
 		json.put(Keys.NUMBER_OF_PKGS, mNumberOfPkgs);
@@ -229,6 +241,7 @@ public final class DocumentRow {
 	public static class Keys {
 		public static final String AMOUNT = "Amount";
 		public static final String CUSTOM_NEM_MG = "CustomNEMmg";
+		public static final String ID = "RowId";
 		public static final String IS_VOLUME = "IsVolume";
 		public static final String NUMBER_OF_PKGS = "NumberOfPkgs";
 		public static final String TYPE_OF_PKGS = "TypeOfPkgs";

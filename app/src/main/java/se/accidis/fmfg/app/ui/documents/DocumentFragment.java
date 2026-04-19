@@ -133,7 +133,7 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 					dialog.show(getFragmentManager(), CustomRowDialogFragment.class.getSimpleName());
 				} else {
 					MaterialsLoadDialogFragment dialog = new MaterialsLoadDialogFragment();
-					dialog.setArguments(row.getMaterial().toBundle());
+					dialog.setArguments(MaterialsLoadDialogFragment.createArguments(row.getMaterial(), row));
 					dialog.setDialogListener(new MaterialsLoadDialogListener());
 					dialog.show(getFragmentManager(), MaterialsLoadDialogFragment.class.getSimpleName());
 				}

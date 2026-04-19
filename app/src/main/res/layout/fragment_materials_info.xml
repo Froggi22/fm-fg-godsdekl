@@ -26,6 +26,17 @@
             android:text="@string/material_load"/>
 
         <Button
+            android:id="@+id/material_button_change"
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_create_small"
+            android:text="@string/material_change"
+            android:visibility="gone"/>
+
+        <Button
             android:id="@+id/material_button_remove"
             style="?android:buttonBarButtonStyle"
             android:layout_width="0dp"
