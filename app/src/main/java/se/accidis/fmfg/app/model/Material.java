@@ -29,6 +29,8 @@ public final class Material {
 	private static long sUuidCounter = 0;
 
 	private final List<FM> mFM; // Förrådsbeteckningar, Förrådsbenämningar, NEMmg
+	private final String mBegrMgd; // Begränsad mängd
+	private final List<String> mFrpInstr; // Förpackningsinstruktioner
 	private final String mPrimaryFben;
 	private final String mPrimaryFbet;
 	private final String mFrpGrp; // Förpackningsgrupp
@@ -43,6 +45,9 @@ public final class Material {
 	private final boolean mMiljoDefined; // True if JSON explicitly specified value
 	private final int mNEMmg; // NEM i mg
 	private final boolean mHasPresetNEM;
+	private final String mRedMgd; // Reducerad mängd
+	private final List<String> mSarbest; // Särbestämmelser
+	private final List<String> mSarbestFrp; // Särbestämmelser förpackning
 	private final String mTpben; // Transportbenämning
 	private final String mSearchText;
 	private final int mSelectedFmIndex; // Selected FM entry, -1 if none
@@ -52,10 +57,10 @@ public final class Material {
 	private final String mUuid;
 
 	public static Material createCustom(String tpben, List<String> etiketter, String uuid) {
-		return new Material(Collections.<FM>emptyList(), "", tpben, etiketter, NO_FM_SELECTED, false, TPKAT_NONE, "", "", "", "", false, false, true, uuid, false);
+		return new Material(Collections.<FM>emptyList(), "", tpben, etiketter, NO_FM_SELECTED, false, TPKAT_NONE, "", "", "", "", false, false, Collections.<String>emptyList(), "", "", Collections.<String>emptyList(), Collections.<String>emptyList(), true, uuid, false);
 	}
 
-	private Material(List<FM> fm, String unNr, String tpben, List<String> etiketter, int selectedFmIndex, boolean hasPresetNEM, int tpKat, String frpGrp, String klass, String klassKod, String tunnelKod, boolean miljo, boolean miljoDefined, boolean isCustom, String uuid, boolean selectDefaultFm) {
+	private Material(List<FM> fm, String unNr, String tpben, List<String> etiketter, int selectedFmIndex, boolean hasPresetNEM, int tpKat, String frpGrp, String klass, String klassKod, String tunnelKod, boolean miljo, boolean miljoDefined, List<String> sarbest, String begrMgd, String redMgd, List<String> frpInstr, List<String> sarbestFrp, boolean isCustom, String uuid, boolean selectDefaultFm) {
 		List<FM> fmList = (null != fm) ? fm : Collections.<FM>emptyList();
 		mFM = Collections.unmodifiableList(new ArrayList<>(fmList));
 		int fmIndex = sanitizeSelectedFmIndex(selectedFmIndex, mFM);
@@ -80,6 +85,11 @@ public final class Material {
 		mTunnelkod = tunnelKod;
 		mMiljo = miljo;
 		mMiljoDefined = miljoDefined;
+		mSarbest = Collections.unmodifiableList(new ArrayList<>(null != sarbest ? sarbest : Collections.<String>emptyList()));
+		mBegrMgd = begrMgd;
+		mRedMgd = redMgd;
+		mFrpInstr = Collections.unmodifiableList(new ArrayList<>(null != frpInstr ? frpInstr : Collections.<String>emptyList()));
+		mSarbestFrp = Collections.unmodifiableList(new ArrayList<>(null != sarbestFrp ? sarbestFrp : Collections.<String>emptyList()));
 		mIsCustom = isCustom;
 
 		mLabelsText = createLabels();
@@ -106,11 +116,16 @@ public final class Material {
 		final String uuid = bundle.getString(Keys.UUID, null);
 		final String klass = bundle.getString(Keys.KLASS);
 		final String klassKod = bundle.getString(Keys.KLASSKOD);
+		final List<String> sarbest = getStringListFromBundle(bundle, Keys.SARBEST);
+		final String begrMgd = bundle.getString(Keys.BEGRMGD);
+		final String redMgd = bundle.getString(Keys.REDMGD);
+		final List<String> frpInstr = getStringListFromBundle(bundle, Keys.FRPINSTR);
+		final List<String> sarbestFrp = getStringListFromBundle(bundle, Keys.SARBESTFRP);
 
 		final String[] etiketterArray = bundle.getStringArray(Keys.ETIKETTER);
 		final List<String> etiketter = (null != etiketterArray ? Arrays.asList(etiketterArray) : new ArrayList<String>(0));
 
-		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, uuid, false);
+		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, sarbest, begrMgd, redMgd, frpInstr, sarbestFrp, isCustom, uuid, false);
 	}
 
 	public static Material fromJSON(JSONObject json) throws JSONException {
@@ -128,6 +143,11 @@ public final class Material {
 		final boolean miljoDefined = !json.isNull(Keys.MILJO);
 		final boolean miljo = json.optBoolean(Keys.MILJO);
 		final boolean isCustom = json.optBoolean(Keys.IS_CUSTOM);
+		final List<String> sarbest = getStringListFromJson(json, Keys.SARBEST);
+		final String begrMgd = JSONUtils.getStringOrNull(json, Keys.BEGRMGD);
+		final String redMgd = JSONUtils.getStringOrNull(json, Keys.REDMGD);
+		final List<String> frpInstr = getStringListFromJson(json, Keys.FRPINSTR);
+		final List<String> sarbestFrp = getStringListFromJson(json, Keys.SARBESTFRP);
 
 		final JSONArray etiketterJson = json.optJSONArray(Keys.ETIKETTER);
 		final List<String> etiketter = new ArrayList<>((null == etiketterJson) ? 0 : etiketterJson.length());
@@ -137,7 +157,7 @@ public final class Material {
 			}
 		}
 
-		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, null, !hasSelectedFmIndex);
+		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, sarbest, begrMgd, redMgd, frpInstr, sarbestFrp, isCustom, null, !hasSelectedFmIndex);
 	}
 
 	private static List<FM> getFbetFbenFromBundle(Bundle bundle) {
@@ -180,6 +200,25 @@ public final class Material {
 		return fm;
 	}
 
+	private static List<String> getStringListFromBundle(Bundle bundle, String key) {
+		String[] values = bundle.getStringArray(key);
+		return null != values ? Arrays.asList(values) : Collections.<String>emptyList();
+	}
+
+	private static List<String> getStringListFromJson(JSONObject json, String key) throws JSONException {
+		JSONArray valuesJson = json.optJSONArray(key);
+		List<String> values = new ArrayList<>((null == valuesJson) ? 0 : valuesJson.length());
+		if (null != valuesJson) {
+			for (int i = 0; i < valuesJson.length(); i++) {
+				String value = valuesJson.getString(i);
+				if (!TextUtils.isEmpty(value)) {
+					values.add(value);
+				}
+			}
+		}
+		return values;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof Material)) {
@@ -220,6 +259,14 @@ public final class Material {
 
 	public boolean requiresFmSelection() {
 		return mFM.size() > 1;
+	}
+
+	public String getBegrMgd() {
+		return mBegrMgd;
+	}
+
+	public List<String> getFrpInstr() {
+		return mFrpInstr;
 	}
 
 	public String getFrpGrp() {
@@ -271,6 +318,18 @@ public final class Material {
 		return mHasPresetNEM;
 	}
 
+	public String getRedMgd() {
+		return mRedMgd;
+	}
+
+	public List<String> getSarbest() {
+		return mSarbest;
+	}
+
+	public List<String> getSarbestFrp() {
+		return mSarbestFrp;
+	}
+
 	public String getTpben() {
 		return mTpben;
 	}
@@ -280,7 +339,7 @@ public final class Material {
 		if (sanitizedIndex == mSelectedFmIndex) {
 			return this;
 		}
-		return new Material(mFM, mUNnr, mTpben, mEtiketter, sanitizedIndex, mHasPresetNEM, mTpKat, mFrpGrp, mKlass, mKlassKod, mTunnelkod, mMiljo, mMiljoDefined, mIsCustom, (mIsCustom ? mUuid : null), false);
+		return new Material(mFM, mUNnr, mTpben, mEtiketter, sanitizedIndex, mHasPresetNEM, mTpKat, mFrpGrp, mKlass, mKlassKod, mTunnelkod, mMiljo, mMiljoDefined, mSarbest, mBegrMgd, mRedMgd, mFrpInstr, mSarbestFrp, mIsCustom, (mIsCustom ? mUuid : null), false);
 	}
 
 	public int getTpKat() {
@@ -346,6 +405,11 @@ public final class Material {
 		bundle.putString(Keys.KLASS, mKlass);
 		bundle.putString(Keys.KLASSKOD, mKlassKod);
 		bundle.putString(Keys.TUNNELKOD, mTunnelkod);
+		bundle.putStringArray(Keys.SARBEST, mSarbest.toArray(new String[mSarbest.size()]));
+		bundle.putString(Keys.BEGRMGD, mBegrMgd);
+		bundle.putString(Keys.REDMGD, mRedMgd);
+		bundle.putStringArray(Keys.FRPINSTR, mFrpInstr.toArray(new String[mFrpInstr.size()]));
+		bundle.putStringArray(Keys.SARBESTFRP, mSarbestFrp.toArray(new String[mSarbestFrp.size()]));
 		bundle.putBoolean(Keys.MILJO, mMiljo);
 		bundle.putBoolean(Keys.MILJO_DEFINED, mMiljoDefined);
 		if (mIsCustom) {
@@ -376,6 +440,11 @@ public final class Material {
 		json.put(Keys.KLASS, mKlass);
 		json.put(Keys.KLASSKOD, mKlassKod);
 		json.put(Keys.TUNNELKOD, mTunnelkod);
+		json.put(Keys.SARBEST, new JSONArray(mSarbest));
+		json.put(Keys.BEGRMGD, mBegrMgd);
+		json.put(Keys.REDMGD, mRedMgd);
+		json.put(Keys.FRPINSTR, new JSONArray(mFrpInstr));
+		json.put(Keys.SARBESTFRP, new JSONArray(mSarbestFrp));
 		if (mMiljoDefined) {
 			json.put(Keys.MILJO, mMiljo);
 		} else {
@@ -626,6 +695,7 @@ public List<String> getDisplayEtiketter() {
 	}
 
 	public static class Keys {
+		public static final String BEGRMGD = "BegrMgd";
 		public static final String FBEN = "Fben";
 		public static final String FBET = "Fbet";
 		public static final String FM = "FM";
@@ -634,6 +704,7 @@ public List<String> getDisplayEtiketter() {
 		public static final String FBEN_LIST = "FbenList";
 		public static final String FBET_LIST = "FbetList";
 		public static final String FRPGRP = "FrpGrp";
+		public static final String FRPINSTR = "FrpInstr";
 		public static final String ETIKETTER = "Etiketter";
 		public static final String KLASS = "Klass";
 		public static final String KLASSKOD = "KlassKod";
@@ -642,6 +713,9 @@ public List<String> getDisplayEtiketter() {
 		public static final String MILJO_DEFINED = "MiljoDefined";
 		public static final String TPBEN = "Tpben";
 		public static final String NEMMG = "NEMmg";
+		public static final String REDMGD = "RedMgd";
+		public static final String SARBEST = "Särbest";
+		public static final String SARBESTFRP = "SärbestFrp";
 		public static final String HAS_NEM = "HasNEM";
 		public static final String TPKAT = "TpKat";
 		public static final String TUNNELKOD = "TunnelKod";

@@ -90,10 +90,10 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_tpben"/>
+                            android:text="@string/material_unnr"/>
 
                         <TextView
-                            android:id="@+id/material_tpben"
+                            android:id="@+id/material_unnr"
                             style="@style/MaterialLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -112,10 +112,10 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_unnr"/>
+                            android:text="@string/material_tpben"/>
 
                         <TextView
-                            android:id="@+id/material_unnr"
+                            android:id="@+id/material_tpben"
                             style="@style/MaterialLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -146,22 +146,20 @@
                     </TableRow>
 
                     <TableRow
-                        android:id="@+id/material_frpgrp_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp">
 
                         <TextView
-                            android:id="@+id/material_frpgrp_heading"
                             style="@style/MaterialHeading"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_frpgrp"/>
+                            android:text="@string/material_tpkat"/>
 
                         <TextView
-                            android:id="@+id/material_frpgrp"
+                            android:id="@+id/material_tpkat"
                             style="@style/MaterialLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -194,9 +192,10 @@
                     </TableRow>
 
                     <TableRow
+                        android:id="@+id/material_sarbest_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="8dp">
+                        android:paddingBottom="5dp">
 
                         <TextView
                             style="@style/MaterialHeading"
@@ -204,16 +203,86 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_tpkat"/>
+                            android:text="@string/material_sarbest"/>
 
                         <TextView
-                            android:id="@+id/material_tpkat"
+                            android:id="@+id/material_sarbest"
                             style="@style/MaterialLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="top"/>
                     </TableRow>
+
+                    <TableRow
+                        android:id="@+id/material_begrmgd_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_begrmgd"/>
+
+                        <TextView
+                            android:id="@+id/material_begrmgd"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/material_redmgd_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_redmgd"/>
+
+                        <TextView
+                            android:id="@+id/material_redmgd"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/material_frpinstr_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_frpinstr"/>
+
+                        <TextView
+                            android:id="@+id/material_frpinstr"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
                 </TableLayout>
 
 				<TextView

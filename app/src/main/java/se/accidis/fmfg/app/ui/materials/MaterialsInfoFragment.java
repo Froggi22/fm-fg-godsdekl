@@ -85,17 +85,10 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 			etiketterView.setText(R.string.material_no_data);
 		}
 
-		// Förpackningsgrupp
-		View frpGrpRow = view.findViewById(R.id.material_frpgrp_row);
-		TextView frpGrpHeading = (TextView) view.findViewById(R.id.material_frpgrp_heading);
-		TextView frpGrpView = (TextView) view.findViewById(R.id.material_frpgrp);
-		if (!TextUtils.isEmpty(mMaterial.getFrpGrp())) {
-			frpGrpView.setText(mMaterial.getFrpGrp());
-		} else {
-			frpGrpRow.setVisibility(View.GONE);
-			frpGrpHeading.setVisibility(View.GONE);
-			frpGrpView.setVisibility(View.GONE);
-		}
+		populateOptionalTextRow(view, R.id.material_sarbest_row, R.id.material_sarbest, joinValues(mMaterial.getSarbest()));
+		populateOptionalTextRow(view, R.id.material_begrmgd_row, R.id.material_begrmgd, mMaterial.getBegrMgd());
+		populateOptionalTextRow(view, R.id.material_redmgd_row, R.id.material_redmgd, mMaterial.getRedMgd());
+		populateOptionalTextRow(view, R.id.material_frpinstr_row, R.id.material_frpinstr, joinValues(mMaterial.getFrpInstr()));
 
 		// Tunnelrestriktionskod
 		View tunnelKodRow = view.findViewById(R.id.material_tunnelkod_row);
@@ -139,6 +132,24 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		refreshDocumentState();
 
 		return view;
+	}
+
+	private void populateOptionalTextRow(View rootView, int rowId, int valueId, String value) {
+		View row = rootView.findViewById(rowId);
+		TextView valueView = (TextView) rootView.findViewById(valueId);
+		if (!TextUtils.isEmpty(value)) {
+			valueView.setText(value);
+		} else {
+			row.setVisibility(View.GONE);
+			valueView.setVisibility(View.GONE);
+		}
+	}
+
+	private String joinValues(List<String> values) {
+		if (null == values || values.isEmpty()) {
+			return null;
+		}
+		return TextUtils.join(", ", values);
 	}
 
 	private void populateLabelsView(LinearLayout layout) {

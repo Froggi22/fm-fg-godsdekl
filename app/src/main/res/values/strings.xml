@@ -99,7 +99,9 @@
     <string name="material_change">Ändra</string>
     <string name="material_favorite_add">Lägg till favorit</string>
     <string name="material_favorite_remove">Ta bort favorit</string>
+    <string name="material_begrmgd">Begränsad mängd</string>
     <string name="material_fm">Militära Benämningar</string>
+    <string name="material_frpinstr">Förpackningsinstruktioner</string>
     <string name="material_frpgrp">Förpackningsgrupp</string>
     <string name="material_etiketter">Etiketter</string>
     <string name="material_load">Lasta</string>
@@ -111,6 +113,9 @@
     <string name="material_remove">Ta bort</string>
     <string name="material_remove_confirm_title">Ta bort gods?</string>
     <string name="material_remove_confirm_message">Vill du verkligen ta bort godset från godsdeklarationen?</string>
+    <string name="material_redmgd">Reducerad mängd</string>
+    <string name="material_sarbest">Särbestämmelser</string>
+    <string name="material_sarbestfrp">Särbestämmelser förpackning</string>
     <string name="material_tunnelkod">Tunnelrestriktionskod</string>
     <string name="material_tpkat">Transportkategori</string>
     <string name="material_unnr">UN-nummer</string>
