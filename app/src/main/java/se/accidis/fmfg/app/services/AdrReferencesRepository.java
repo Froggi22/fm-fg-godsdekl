@@ -57,11 +57,32 @@ public final class AdrReferencesRepository {
 		}
 
 		JSONObject sectionReferences = references.optJSONObject(section);
-		if (null == sectionReferences || !sectionReferences.has(code)) {
+		if (null == sectionReferences) {
 			return null;
 		}
 
-		return sectionReferences.opt(code);
+		if (sectionReferences.has(code)) {
+			return sectionReferences.opt(code);
+		}
+
+		if (SECTION_SARBEST.equals(section)) {
+			String numericCode = getLeadingDigits(code);
+			if (!TextUtils.isEmpty(numericCode) && !numericCode.equals(code) && sectionReferences.has(numericCode)) {
+				return sectionReferences.opt(numericCode);
+			}
+		}
+
+		return null;
+	}
+
+	private String getLeadingDigits(String value) {
+		int length = value.length();
+		int end = 0;
+		while (end < length && Character.isDigit(value.charAt(end))) {
+			end++;
+		}
+
+		return value.substring(0, end);
 	}
 
 	private JSONObject getReferences() {
