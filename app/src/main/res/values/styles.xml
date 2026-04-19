@@ -180,6 +180,12 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="MaterialLoadExpressionResult">
+        <item name="android:layout_marginTop">-4dp</item>
+        <item name="android:textColor">@color/darkgray</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 	<style name="MaterialLoadRequiredMarker">
 		<item name="android:layout_gravity">center_vertical</item>
 		<item name="android:layout_marginLeft">4dp</item>

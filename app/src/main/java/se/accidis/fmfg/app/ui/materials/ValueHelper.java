@@ -42,14 +42,19 @@ public final class ValueHelper {
 	}
 
 	public static BigDecimal parseValue(String text) {
+		BigDecimal value = parseValueOrNull(text);
+		return null == value ? BigDecimal.ZERO : value;
+	}
+
+	public static BigDecimal parseValueOrNull(String text) {
 		if (TextUtils.isEmpty(text)) {
-			return BigDecimal.ZERO;
+			return null;
 		}
 
 		try {
 			return new ExpressionParser(text).parse();
 		} catch (IllegalArgumentException | ArithmeticException ignored) {
-			return BigDecimal.ZERO;
+			return null;
 		}
 	}
 
