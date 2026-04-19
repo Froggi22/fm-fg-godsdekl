@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.UUID;
 
 import se.accidis.fmfg.app.R;
@@ -27,6 +28,7 @@ public final class DocumentRow {
 	private Boolean mMiljoOverride; // Användardefinierad Miljo
 	private boolean mIsVolume; // Huruvida kvantitet är angiven i liter
 	private int mNumberOfPkgs; // Antal kolli
+	private String mTechnicalName; // Teknisk benämning för N.O.S.
 	private String mTypeOfPkgs; // Beskrivning av kolli
 	private BigDecimal mWeightVolume; // Kvantitet farligt gods i liter / kg
 
@@ -38,6 +40,7 @@ public final class DocumentRow {
 		mMiljoOverride = null;
 		mMaterial = material;
 		mMultiplier = new BigDecimal(ValueHelper.getMultiplierByTpKat(mMaterial.getTpKat()));
+		mTechnicalName = "";
 		mTypeOfPkgs = "";
 		mWeightVolume = BigDecimal.ZERO;
 	}
@@ -52,6 +55,7 @@ public final class DocumentRow {
 		row.mAmount = new BigDecimal(json.getString(Keys.AMOUNT));
 		row.mIsVolume = json.getBoolean(Keys.IS_VOLUME);
 		row.mNumberOfPkgs = json.getInt(Keys.NUMBER_OF_PKGS);
+		row.mTechnicalName = json.optString(Keys.TECHNICAL_NAME, "");
 		row.mTypeOfPkgs = json.optString(Keys.TYPE_OF_PKGS, "");
 		row.mWeightVolume = new BigDecimal(json.getString(Keys.WEIGHT_VOLUME));
 		if (json.has(Keys.MILJO_OVERRIDE)) {
@@ -80,6 +84,7 @@ public final class DocumentRow {
 		other.mMiljoOverride = mMiljoOverride;
 		other.mIsVolume = mIsVolume;
 		other.mNumberOfPkgs = mNumberOfPkgs;
+		other.mTechnicalName = mTechnicalName;
 		other.mTypeOfPkgs = mTypeOfPkgs;
 		other.mWeightVolume = mWeightVolume;
 	}
@@ -110,12 +115,29 @@ public final class DocumentRow {
 		return mMaterial;
 	}
 
+	public String getMaterialFullText() {
+		String fullText = mMaterial.getFullText();
+		if (!requiresTechnicalName() || TextUtils.isEmpty(mTechnicalName)) {
+			return fullText;
+		}
+		String tpben = mMaterial.getTpben();
+		int tpbenIndex = fullText.indexOf(tpben);
+		if (tpbenIndex < 0) {
+			return fullText + " (" + mTechnicalName.trim() + ')';
+		}
+		int insertIndex = tpbenIndex + tpben.length();
+		return fullText.substring(0, insertIndex) + " (" + mTechnicalName.trim() + ')' + fullText.substring(insertIndex);
+	}
+
 	public void setMaterial(Material material) {
 		mMaterial = material;
 		mMultiplier = new BigDecimal(ValueHelper.getMultiplierByTpKat(mMaterial.getTpKat()));
 		if (mMaterial.hasPresetNEMValue() || mMaterial.hasNEM()) {
 			mCustomNEMmg = null;
 			mCustomNEMUnit = Keys.CUSTOM_NEM_UNIT_AMOUNT;
+		}
+		if (!requiresTechnicalName()) {
+			mTechnicalName = "";
 		}
 	}
 
@@ -158,6 +180,19 @@ public final class DocumentRow {
 
 	public void setNumberOfPackages(int numPackages) {
 		mNumberOfPkgs = numPackages;
+	}
+
+	public boolean requiresTechnicalName() {
+		String tpben = mMaterial.getTpben();
+		return !TextUtils.isEmpty(tpben) && tpben.toUpperCase(Locale.ROOT).contains("N.O.S");
+	}
+
+	public String getTechnicalName() {
+		return mTechnicalName;
+	}
+
+	public void setTechnicalName(String technicalName) {
+		mTechnicalName = (null != technicalName ? technicalName.trim() : "");
 	}
 
 	public String getPackagesText(Context context) {
@@ -235,6 +270,9 @@ public final class DocumentRow {
 		json.put(Keys.AMOUNT, mAmount.toString());
 		json.put(Keys.IS_VOLUME, mIsVolume);
 		json.put(Keys.NUMBER_OF_PKGS, mNumberOfPkgs);
+		if (!TextUtils.isEmpty(mTechnicalName)) {
+			json.put(Keys.TECHNICAL_NAME, mTechnicalName);
+		}
 		json.put(Keys.TYPE_OF_PKGS, mTypeOfPkgs);
 		json.put(Keys.WEIGHT_VOLUME, mWeightVolume.toString());
 		if (null != mCustomNEMmg) {
@@ -276,6 +314,7 @@ public final class DocumentRow {
 		public static final String ID = "RowId";
 		public static final String IS_VOLUME = "IsVolume";
 		public static final String NUMBER_OF_PKGS = "NumberOfPkgs";
+		public static final String TECHNICAL_NAME = "TechnicalName";
 		public static final String TYPE_OF_PKGS = "TypeOfPkgs";
 		public static final String WEIGHT_VOLUME = "WeightVolume";
 		public static final String MILJO_OVERRIDE = "MiljoOverride";

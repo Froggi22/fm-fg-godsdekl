@@ -121,7 +121,7 @@ public final class PdfGenerator {
 
 	@NonNull
 	private List<Cell> createDocumentRow1(DocumentRow row) {
-		Cell materialCell = new Cell(mTextFont, row.getMaterial().getFullText());
+		Cell materialCell = new Cell(mTextFont, row.getMaterialFullText());
 		materialCell.setLeftPadding(0);
 		if (row.isFreeText()) {
 			materialCell.setBottomPadding(ROW_BOTTOM_PADDING);

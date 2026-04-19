@@ -22,10 +22,40 @@
 			android:visibility="gone" />
 
 		<LinearLayout
-			android:id="@+id/material_load_fm_heading"
+			android:id="@+id/material_load_technical_name_heading"
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="1"
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_technical_name" />
+
+			<TextView
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*" />
+		</LinearLayout>
+
+		<EditText
+			android:id="@+id/material_load_technical_name"
+			android:layout_width="200dp"
+			android:layout_column="1"
+			android:layout_row="1"
+			android:inputType="textCapSentences"
+			android:maxLength="80"
+			android:visibility="gone" />
+
+		<LinearLayout
+			android:id="@+id/material_load_fm_heading"
+			style="@style/MaterialLoadRequiredHeading"
+			android:layout_column="0"
+			android:layout_row="2"
 			android:orientation="horizontal"
 			android:visibility="gone">
 
@@ -49,13 +79,13 @@
 			android:layout_width="140dp"
 			android:layout_height="wrap_content"
 			android:layout_column="1"
-			android:layout_row="1"
+			android:layout_row="2"
 			android:visibility="gone" />
 
 		<LinearLayout
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
-			android:layout_row="2"
+			android:layout_row="3"
 			android:orientation="horizontal">
 
 			<TextView
@@ -75,14 +105,14 @@
 			android:id="@+id/material_load_number_pkgs"
 			android:layout_width="60dp"
 			android:layout_column="1"
-			android:layout_row="2"
+			android:layout_row="3"
 			android:inputType="number"
 			android:maxLength="5" />
 
 		<LinearLayout
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
-			android:layout_row="3"
+			android:layout_row="4"
 			android:orientation="horizontal">
 
 			<TextView
@@ -102,13 +132,13 @@
 			android:id="@+id/material_load_type_pkgs"
 			android:layout_width="100dp"
 			android:layout_column="1"
-			android:layout_row="3"
+			android:layout_row="4"
 			android:inputType="text" />
 
 		<LinearLayout
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
-			android:layout_row="4"
+			android:layout_row="5"
 			android:orientation="horizontal">
 
 			<TextView
@@ -126,7 +156,7 @@
 
 		<LinearLayout
 			android:layout_column="1"
-			android:layout_row="4"
+			android:layout_row="5"
 			android:orientation="horizontal">
 
 			<EditText
@@ -146,7 +176,7 @@
 			android:id="@+id/material_load_amount_heading"
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
-			android:layout_row="5"
+			android:layout_row="6"
 			android:orientation="horizontal">
 
 			<TextView
@@ -167,7 +197,7 @@
 		<LinearLayout
 			android:id="@+id/material_load_amount_layout"
 			android:layout_column="1"
-			android:layout_row="5"
+			android:layout_row="6"
 			android:orientation="horizontal">
 
 			<EditText
@@ -191,7 +221,7 @@
 			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_marginTop="5dp"
-			android:layout_row="6"
+			android:layout_row="7"
 			android:orientation="horizontal">
 
 			<TextView
@@ -213,7 +243,7 @@
 			android:id="@+id/material_load_custom_nem_layout"
 			android:layout_column="1"
 			android:layout_marginTop="5dp"
-			android:layout_row="6"
+			android:layout_row="7"
 			android:orientation="horizontal">
 
 			<EditText
@@ -238,7 +268,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_column="1"
-			android:layout_row="7"
+			android:layout_row="8"
 			android:orientation="horizontal"
 			android:visibility="gone">
 
@@ -260,7 +290,7 @@
 			style="@style/MaterialLoadDialogLabelHeading"
 			android:layout_column="0"
 			android:layout_marginTop="5dp"
-			android:layout_row="8"
+			android:layout_row="9"
 			android:text="@string/material_load_nem" />
 
 		<TextView
@@ -268,50 +298,50 @@
 			style="@style/MaterialLoadDialogLabel"
 			android:layout_column="1"
 			android:layout_marginTop="5dp"
-			android:layout_row="8" />
+			android:layout_row="9" />
 
 		<TextView
 			style="@style/MaterialLoadDialogSubLabelHeading"
 			android:layout_column="0"
-			android:layout_row="9"
+			android:layout_row="10"
 			android:text="@string/material_load_multiplier" />
 
 		<TextView
 			android:id="@+id/material_load_multiplier"
 			style="@style/MaterialLoadDialogSubLabel"
 			android:layout_column="1"
-			android:layout_row="9" />
+			android:layout_row="10" />
 
 		<TextView
 			style="@style/MaterialLoadDialogLabelHeading"
 			android:layout_column="0"
-			android:layout_row="10"
+			android:layout_row="11"
 			android:text="@string/material_load_value" />
 
 		<TextView
 			android:id="@+id/material_load_value"
 			style="@style/MaterialLoadDialogLabel"
 			android:layout_column="1"
-			android:layout_row="10" />
+			android:layout_row="11" />
 
 		<TextView
 			style="@style/MaterialLoadDialogSubLabelHeading"
 			android:layout_column="0"
-			android:layout_row="11"
+			android:layout_row="12"
 			android:text="@string/material_load_total_value" />
 
 		<TextView
 			android:id="@+id/material_load_total_value"
 			style="@style/MaterialLoadDialogSubLabel"
 			android:layout_column="1"
-			android:layout_row="11" />
+			android:layout_row="12" />
 
 		<CheckBox
 			android:id="@+id/material_load_miljo"
 			android:layout_column="0"
 			android:layout_columnSpan="2"
 			android:layout_marginTop="10dp"
-			android:layout_row="12"
+			android:layout_row="13"
 			android:text="@string/material_load_miljo"
 			android:visibility="gone" />
 	</GridLayout>

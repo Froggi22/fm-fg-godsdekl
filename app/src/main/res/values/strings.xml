@@ -102,6 +102,7 @@
     <string name="material_load">Lasta</string>
     <string name="material_load_new">Lasta ny</string>
     <string name="material_tpben">Transportbenämning</string>
+    <string name="material_load_technical_name">Teknisk benämning:</string>
     <string name="material_nem_kg_format">NEM %1$s kg</string>
     <string name="material_no_data">-</string>
     <string name="material_remove">Ta bort</string>

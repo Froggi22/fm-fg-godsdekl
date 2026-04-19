@@ -288,7 +288,7 @@ public final class DocumentAdapter extends BaseAdapter {
 		DocumentRow row = mRows.get(rowIndex);
 
 		TextView fullTextText = (TextView) view.findViewById(R.id.document_row_text);
-		fullTextText.setText(row.getMaterial().getFullText());
+		fullTextText.setText(row.getMaterialFullText());
 
 		TextView materialText = (TextView) view.findViewById(R.id.document_row_fben);
 

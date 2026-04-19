@@ -71,6 +71,8 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private EditText mNumberPkgsField;
 	private DocumentsRepository mRepository;
 	private UUID mEditingRowId;
+	private EditText mTechnicalNameField;
+	private View mTechnicalNameHeading;
 	private TextView mTotalValueView;
 	private AutoCompleteTextView mTypePkgsField;
 	private TextView mValueView;
@@ -122,7 +124,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mTotalValueView = (TextView) view.findViewById(R.id.material_load_total_value);
 		mNEMHeading = view.findViewById(R.id.material_load_nem_heading);
 		mNEMView = (TextView) view.findViewById(R.id.material_load_nem);
+		mTechnicalNameHeading = view.findViewById(R.id.material_load_technical_name_heading);
+		mTechnicalNameField = (EditText) view.findViewById(R.id.material_load_technical_name);
 		mCustomNEMMode = (null != row && null != row.getCustomNEMmg() && canToggleCustomNEMMode());
+		initializeTechnicalNameInput(row);
 		initializeFmSpinner(view);
 		initializeCustomNEMInput(row);
 		initializeCustomNEMUnit(row);
@@ -296,6 +301,16 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mCustomNEMToggle.setVisibility(View.VISIBLE);
 		mCustomNEMToggle.setChecked(!mCustomNEMMode);
 		mCustomNEMToggle.setOnCheckedChangeListener(new CustomNEMModeChangedListener());
+	}
+
+	private void initializeTechnicalNameInput(DocumentRow row) {
+		DocumentRow technicalNameRow = (null != row ? row : new DocumentRow(mMaterial));
+		boolean showTechnicalName = technicalNameRow.requiresTechnicalName();
+		mTechnicalNameHeading.setVisibility(showTechnicalName ? View.VISIBLE : View.GONE);
+		mTechnicalNameField.setVisibility(showTechnicalName ? View.VISIBLE : View.GONE);
+		if (showTechnicalName && null != row) {
+			mTechnicalNameField.setText(row.getTechnicalName());
+		}
 	}
 
 	private void updateNemInputModeVisibility() {
@@ -481,6 +496,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			row.setNumberOfPackages(numberPkgs);
 			String typePkgs = mTypePkgsField.getText().toString().trim();
 			row.setTypeOfPackages(typePkgs);
+			row.setTechnicalName(mTechnicalNameField.getVisibility() == View.VISIBLE ? mTechnicalNameField.getText().toString() : "");
 			row.setAmount(isCustomNEMPerPackageSelected() ? BigDecimal.ZERO : mAmount);
 			BigDecimal customNEMmg = (isClass1() && (mCustomNEMMode || !mMaterial.hasPresetNEMValue())) ? convertKgToMg(mCustomNEMkg) : null;
 			row.setCustomNEMmg(customNEMmg);
