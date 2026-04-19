@@ -39,6 +39,7 @@ public final class DocumentAdapter extends BaseAdapter {
 	public static final int VIEW_TYPE_SEPARATOR = 3;
 	private static final int ROW_BASE_TOP_OFFSET = 3;
 	private static final int ROW_BOTTOM_OFFSET = 2;
+	private static final String LABEL_61 = "6.1";
 	private final Context mContext;
 	private final LayoutInflater mInflater;
 	private Document mDocument;
@@ -260,6 +261,9 @@ public final class DocumentAdapter extends BaseAdapter {
 
 		View warningTotalValueView = view.findViewById(R.id.document_warning_total_value);
 		warningTotalValueView.setVisibility(mDocument.hasTotalValueAboveAdrLimit() ? View.VISIBLE : View.GONE);
+
+		View warningLabel61View = view.findViewById(R.id.document_warning_label61);
+		warningLabel61View.setVisibility(mDocument.hasLabel(LABEL_61) ? View.VISIBLE : View.GONE);
 
 		boolean isViolatingColoadingRules = ColoadingHelper.isViolationOfColoadingRules(mDocument);
 		View warningClass1View = view.findViewById(R.id.document_warning_class1);

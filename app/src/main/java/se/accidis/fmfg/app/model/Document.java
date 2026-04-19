@@ -251,6 +251,15 @@ public final class Document {
 		return isProtectedTransportSpecified() || !TextUtils.isEmpty(mVehicleReg) || !TextUtils.isEmpty(mVehicleType);
 	}
 
+	public boolean hasLabel(String label) {
+		for (DocumentRow row : mRows) {
+			if (row.getMaterial().getDisplayEtiketter().contains(label)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean hasTotalValueAboveAdrLimit() {
 		return getCalculatedTotalValue().compareTo(ADR_LIMIT_TOTAL_VALUE) > 0;
 	}
