@@ -146,8 +146,9 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 
 		// Etiketter (bilder)
 		LinearLayout labelsLayout = (LinearLayout) view.findViewById(R.id.material_layout_labels);
-		if (!mMaterial.getEtiketter().isEmpty()) {
-			populateLabelsView(labelsLayout);
+		List<Integer> labelDrawables = LabelsRepository.getLabelsByMaterial(mMaterial, false);
+		if (!labelDrawables.isEmpty()) {
+			populateLabelsView(labelsLayout, labelDrawables);
 		} else {
 			labelsLayout.setVisibility(View.GONE);
 		}
@@ -296,13 +297,11 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		return builder;
 	}
 
-	private void populateLabelsView(LinearLayout layout) {
+	private void populateLabelsView(LinearLayout layout, List<Integer> labels) {
 		Context context = getContext();
 		Resources resources = getResources();
 		int size = resources.getDimensionPixelSize(R.dimen.material_label_size);
 		int margin = resources.getDimensionPixelSize(R.dimen.material_label_margin);
-
-		List<Integer> labels = LabelsRepository.getLabelsByMaterial(mMaterial, false);
 
 		for (Integer label : labels) {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(size, size);
