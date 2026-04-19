@@ -3,6 +3,7 @@ package se.accidis.fmfg.app.ui.materials;
 import android.text.TextUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -45,13 +46,113 @@ public final class ValueHelper {
 			return BigDecimal.ZERO;
 		}
 
-		// BigDecimal constructor accepts only period as separator
-		text = text.replace(',', '.');
-
 		try {
-			return new BigDecimal(text);
-		} catch (NumberFormatException ignored) {
+			return new ExpressionParser(text).parse();
+		} catch (IllegalArgumentException | ArithmeticException ignored) {
 			return BigDecimal.ZERO;
+		}
+	}
+
+	private static final class ExpressionParser {
+		private static final int DIVISION_SCALE = 10;
+		private final String mText;
+		private int mPosition;
+
+		ExpressionParser(String text) {
+			// BigDecimal constructor accepts only period as separator.
+			mText = text.replace(',', '.');
+		}
+
+		BigDecimal parse() {
+			BigDecimal value = parseExpression();
+			skipWhitespace();
+			if (mPosition != mText.length()) {
+				throw new IllegalArgumentException();
+			}
+			return value;
+		}
+
+		private BigDecimal parseExpression() {
+			BigDecimal value = parseTerm();
+			while (true) {
+				skipWhitespace();
+				if (consume('+')) {
+					value = value.add(parseTerm());
+				} else if (consume('-')) {
+					value = value.subtract(parseTerm());
+				} else {
+					return value;
+				}
+			}
+		}
+
+		private BigDecimal parseTerm() {
+			BigDecimal value = parseFactor();
+			while (true) {
+				skipWhitespace();
+				if (consume('*')) {
+					value = value.multiply(parseFactor());
+				} else if (consume('/')) {
+					BigDecimal divisor = parseFactor();
+					if (BigDecimal.ZERO.compareTo(divisor) == 0) {
+						throw new ArithmeticException();
+					}
+					value = value.divide(divisor, DIVISION_SCALE, RoundingMode.HALF_UP).stripTrailingZeros();
+				} else {
+					return value;
+				}
+			}
+		}
+
+		private BigDecimal parseFactor() {
+			skipWhitespace();
+			int sign = 1;
+			if (consume('+')) {
+				sign = 1;
+			} else if (consume('-')) {
+				sign = -1;
+			}
+
+			BigDecimal value = parseNumber();
+			return sign < 0 ? value.negate() : value;
+		}
+
+		private BigDecimal parseNumber() {
+			skipWhitespace();
+			int start = mPosition;
+			boolean hasDigit = false;
+			boolean hasDecimalSeparator = false;
+			while (mPosition < mText.length()) {
+				char ch = mText.charAt(mPosition);
+				if (Character.isDigit(ch)) {
+					hasDigit = true;
+					mPosition++;
+				} else if ('.' == ch && !hasDecimalSeparator) {
+					hasDecimalSeparator = true;
+					mPosition++;
+				} else {
+					break;
+				}
+			}
+
+			if (!hasDigit) {
+				throw new IllegalArgumentException();
+			}
+			return new BigDecimal(mText.substring(start, mPosition));
+		}
+
+		private boolean consume(char expected) {
+			if (mPosition < mText.length() && expected == mText.charAt(mPosition)) {
+				mPosition++;
+				return true;
+			}
+			return false;
+		}
+
+		private void skipWhitespace() {
+			while (mPosition < mText.length() && Character.isWhitespace(mText.charAt(mPosition))) {
+				mPosition++;
+			}
 		}
 	}
 }

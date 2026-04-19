@@ -167,8 +167,9 @@
 				android:id="@+id/material_load_weight_volume"
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
-				android:inputType="numberDecimal"
-				android:maxLength="7" />
+				android:digits="0123456789,.+-*/ "
+				android:inputType="text"
+				android:maxLength="20" />
 
 			<Spinner
 				android:id="@+id/material_load_weight_volume_unit"
@@ -209,8 +210,9 @@
 				android:id="@+id/material_load_amount"
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
-				android:inputType="numberDecimal"
-				android:maxLength="7" />
+				android:digits="0123456789,.+-*/ "
+				android:inputType="text"
+				android:maxLength="20" />
 
 			<TextView
 				style="@style/MaterialLoadDialogUnit"
@@ -256,9 +258,9 @@
 				android:id="@+id/material_load_custom_nem"
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
-				android:digits="0123456789,."
-				android:inputType="numberDecimal"
-				android:maxLength="16" />
+				android:digits="0123456789,.+-*/ "
+				android:inputType="text"
+				android:maxLength="24" />
 
 			<TextView
 				style="@style/MaterialLoadDialogUnit"
