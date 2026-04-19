@@ -7,7 +7,7 @@ contact me if you have any questions._
 Det här är en mobilapp för digital godsdeklaration av farligt gods-transporter riktad till personal
 inom [Försvarsmakten](http://www.forsvarsmakten.se/). Syftet är att enkelt kunna framställa
 godsdeklarationer som uppfyller kraven i
-[SäkI Tp FG](https://www.forsvarsmakten.se/globalassets/02-om-forsvarsmakten/myndighetsinformation/dokument/reglementen/r-tp-fg-2013.pdf)
+[Reglemente Transport farligt gods](https://www.forsvarsmakten.se/globalassets/02-om-forsvarsmakten/myndighetsinformation/dokument/reglementen/r-tp-fg-2013.pdf)
 vid transport av materiel och utrustning, exempelvis ammunition och drivmedel.
 
 Appen saknar dock anknytning till Försvarsmakten; den är utvecklad på privat initiativ.
@@ -31,6 +31,8 @@ FM FG Godsdeklaration distribueras i enlighet med licensvillkoren i **Apache Lic
 _FM FG Godsdeklaration is distributed according to the terms of the **Apache License version 2.0**._
 
 ## Tillkännagivanden
+[ADR-S 2025](https://www.mcf.se/contentassets/ff5ff478bcdc4cdb81583807013f6cd6/adr-s-2025-spara-andringar.pdf)
+
 FM FG Godsdeklaration använder följande tredjepartsbibliotek och resurser, utöver
 utvecklingsverktyg för Android utgivna av Google:
 
