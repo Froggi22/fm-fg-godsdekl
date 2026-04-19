@@ -86,21 +86,25 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		}
 
 		// Förpackningsgrupp
+		View frpGrpRow = view.findViewById(R.id.material_frpgrp_row);
 		TextView frpGrpHeading = (TextView) view.findViewById(R.id.material_frpgrp_heading);
 		TextView frpGrpView = (TextView) view.findViewById(R.id.material_frpgrp);
 		if (!TextUtils.isEmpty(mMaterial.getFrpGrp())) {
 			frpGrpView.setText(mMaterial.getFrpGrp());
 		} else {
+			frpGrpRow.setVisibility(View.GONE);
 			frpGrpHeading.setVisibility(View.GONE);
 			frpGrpView.setVisibility(View.GONE);
 		}
 
 		// Tunnelrestriktionskod
+		View tunnelKodRow = view.findViewById(R.id.material_tunnelkod_row);
 		TextView tunnelKodHeading = (TextView) view.findViewById(R.id.material_tunnelkod_heading);
 		TextView tunnelKodView = (TextView) view.findViewById(R.id.material_tunnelkod);
 		if (!TextUtils.isEmpty(mMaterial.getTunnelkod())) {
 			tunnelKodView.setText(mMaterial.getTunnelkod());
 		} else {
+			tunnelKodRow.setVisibility(View.GONE);
 			tunnelKodHeading.setVisibility(View.GONE);
 			tunnelKodView.setVisibility(View.GONE);
 		}

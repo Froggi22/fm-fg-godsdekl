@@ -71,82 +71,152 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
                 android:layout_toLeftOf="@id/material_layout_labels"
                 android:orientation="vertical">
 
-                <TextView
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
+                <TableLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/material_tpben"/>
+                    android:shrinkColumns="1"
+                    android:stretchColumns="1">
 
-                <TextView
-                    android:id="@+id/material_tpben"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
 
-                <TextView
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material_unnr"/>
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_tpben"/>
 
-                <TextView
-                    android:id="@+id/material_unnr"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/material_tpben"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
 
-                <TextView
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material_etiketter"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
 
-                <TextView
-                    android:id="@+id/material_etiketter"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_unnr"/>
 
-                <TextView
-                    android:id="@+id/material_frpgrp_heading"
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material_frpgrp"/>
+                        <TextView
+                            android:id="@+id/material_unnr"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/material_frpgrp"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
 
-                <TextView
-                    android:id="@+id/material_tunnelkod_heading"
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material_tunnelkod"/>
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_etiketter"/>
 
-                <TextView
-                    android:id="@+id/material_tunnelkod"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/material_etiketter"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
 
-                <TextView
-                    style="@style/MaterialHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material_tpkat"/>
+                    <TableRow
+                        android:id="@+id/material_frpgrp_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
 
-                <TextView
-                    android:id="@+id/material_tpkat"
-                    style="@style/MaterialLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/material_frpgrp_heading"
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_frpgrp"/>
+
+                        <TextView
+                            android:id="@+id/material_frpgrp"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/material_tunnelkod_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp">
+
+                        <TextView
+                            android:id="@+id/material_tunnelkod_heading"
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_tunnelkod"/>
+
+                        <TextView
+                            android:id="@+id/material_tunnelkod"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp">
+
+                        <TextView
+                            style="@style/MaterialHeading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:gravity="top"
+                            android:text="@string/material_tpkat"/>
+
+                        <TextView
+                            android:id="@+id/material_tpkat"
+                            style="@style/MaterialLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="top"/>
+                    </TableRow>
+                </TableLayout>
 
 				<TextView
                     android:id="@+id/material_fm_heading"
