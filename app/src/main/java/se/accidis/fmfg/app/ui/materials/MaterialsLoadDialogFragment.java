@@ -330,10 +330,14 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		mNEMHeading.setVisibility(showNEM ? View.VISIBLE : View.GONE);
 		mNEMView.setVisibility(showNEM ? View.VISIBLE : View.GONE);
 
-		boolean showAmount = !isCustomNEMPerPackageSelected();
+		boolean showAmount = usesAmountForNEM();
 		mAmountHeading.setVisibility(showAmount ? View.VISIBLE : View.GONE);
 		mAmountLayout.setVisibility(showAmount ? View.VISIBLE : View.GONE);
 		mAmountRequiredMarker.setVisibility(showAmount && isClass1() ? View.VISIBLE : View.GONE);
+	}
+
+	private boolean usesAmountForNEM() {
+		return isClass1() && !isCustomNEMPerPackageSelected();
 	}
 
 	private boolean isCustomNEMPerPackageSelected() {
@@ -497,7 +501,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			String typePkgs = mTypePkgsField.getText().toString().trim();
 			row.setTypeOfPackages(typePkgs);
 			row.setTechnicalName(mTechnicalNameField.getVisibility() == View.VISIBLE ? mTechnicalNameField.getText().toString() : "");
-			row.setAmount(isCustomNEMPerPackageSelected() ? BigDecimal.ZERO : mAmount);
+			row.setAmount(usesAmountForNEM() ? mAmount : BigDecimal.ZERO);
 			BigDecimal customNEMmg = (isClass1() && (mCustomNEMMode || !mMaterial.hasPresetNEMValue())) ? convertKgToMg(mCustomNEMkg) : null;
 			row.setCustomNEMmg(customNEMmg);
 			row.setCustomNEMPerPackage(mCustomNEMPerPackage);
