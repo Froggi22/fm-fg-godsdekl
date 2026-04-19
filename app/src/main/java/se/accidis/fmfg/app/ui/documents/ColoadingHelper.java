@@ -5,6 +5,7 @@ import java.util.List;
 
 import se.accidis.fmfg.app.model.Document;
 import se.accidis.fmfg.app.model.DocumentRow;
+import se.accidis.fmfg.app.model.Material;
 
 /**
  * Simple helper class for validating if a document is in compliance with co-loading rules.
@@ -22,12 +23,12 @@ public final class ColoadingHelper {
          * utom etikett 1.4 med samhanteringsgrupp S får inte lastas på samma fordon som kollin som innehåller farligt
          * gods från övriga klasser.
          */
-        boolean containsClass1 = false, containsNonClass1 = false;
+        boolean containsRestrictedClass1 = false, containsNonClass1 = false;
         for (DocumentRow row : document.getRows()) {
             boolean rowContainsClass1 = containsClass1(row);
-            containsClass1 = (containsClass1 || rowContainsClass1);
+            containsRestrictedClass1 = (containsRestrictedClass1 || (rowContainsClass1 && !isClass14S(row)));
             containsNonClass1 = (containsNonClass1 || !rowContainsClass1);
-            if (containsClass1 && containsNonClass1) {
+            if (containsRestrictedClass1 && containsNonClass1) {
                 return true;
             }
         }
@@ -36,7 +37,7 @@ public final class ColoadingHelper {
          * Kollin som är försedda med etiketterna 1, 1.4, 1.5 och 1.6 och som tillhör olika samhanteringsgrupper i klass 1,
          * får endast samlastas på ett fordon om det tillåts enligt bilden nedan.
          */
-        if (containsClass1) {
+        if (containsRestrictedClass1) {
             List<Character> cohandlingGroups = getCohandlingGroups(document.getRows());
             for (Character group : cohandlingGroups) {
                 if (!areAllowedCohandlingGroups(group, cohandlingGroups)) {
@@ -98,26 +99,49 @@ public final class ColoadingHelper {
     }
 
     private static boolean containsClass1(DocumentRow row) {
-        List<String> etiketter = row.getMaterial().getDisplayEtiketter();
+        Material material = row.getMaterial();
+        String klassKod = material.getKlassKod();
+        if (null != klassKod && klassKod.startsWith(LABEL_1_PREFIX)) {
+            return true;
+        }
+
+        List<String> etiketter = material.getDisplayEtiketter();
         for (String kod : etiketter) {
-            if (kod.startsWith(LABEL_1_PREFIX) && !kod.equals(LABEL_14S)) {
+            if (kod.startsWith(LABEL_1_PREFIX)) {
                 return true;
             }
         }
         return false;
     }
 
+    private static boolean isClass14S(DocumentRow row) {
+        Material material = row.getMaterial();
+        if (LABEL_14S.equals(material.getKlassKod())) {
+            return true;
+        }
+
+        return material.getDisplayEtiketter().contains(LABEL_14S);
+    }
+
     private static List<Character> getCohandlingGroups(List<DocumentRow> rows) {
         List<Character> result = new ArrayList<>();
         for (DocumentRow row : rows) {
-            List<String> etiketter = row.getMaterial().getEtiketter();
-            for (String kod : etiketter) {
-                char cohandlingGroup = kod.charAt(kod.length() - 1);
-                if (kod.startsWith(LABEL_1_PREFIX) && Character.isLetter(cohandlingGroup) && !result.contains(cohandlingGroup)) {
-                    result.add(cohandlingGroup);
-                }
+            addCohandlingGroup(result, row.getMaterial().getKlassKod());
+            for (String kod : row.getMaterial().getDisplayEtiketter()) {
+                addCohandlingGroup(result, kod);
             }
         }
         return result;
+    }
+
+    private static void addCohandlingGroup(List<Character> result, String kod) {
+        if (null == kod || !kod.startsWith(LABEL_1_PREFIX)) {
+            return;
+        }
+
+        char cohandlingGroup = kod.charAt(kod.length() - 1);
+        if (Character.isLetter(cohandlingGroup) && !result.contains(cohandlingGroup)) {
+            result.add(cohandlingGroup);
+        }
     }
 }
