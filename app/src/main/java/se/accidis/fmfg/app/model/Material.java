@@ -379,6 +379,47 @@ public final class Material {
 		return TextUtils.isEmpty(normalizedSearch) || mSearchText.contains(normalizedSearch);
 	}
 
+	public int getSearchPriority(CharSequence search) {
+		if (TextUtils.isEmpty(search)) {
+			return 0;
+		}
+
+		String normalizedSearch = search.toString().toLowerCase().trim();
+		if (TextUtils.isEmpty(normalizedSearch)) {
+			return 0;
+		}
+
+		if (!TextUtils.isEmpty(mUNnr) && mUNnr.toLowerCase().contains(normalizedSearch)) {
+			return 1;
+		}
+		if (!TextUtils.isEmpty(mTpben) && mTpben.toLowerCase().contains(normalizedSearch)) {
+			return 2;
+		}
+
+		for (FM entry : mFM) {
+			if (!TextUtils.isEmpty(entry.getFbet()) && entry.getFbet().toLowerCase().contains(normalizedSearch)) {
+				return 3;
+			}
+		}
+
+		FM display = getDisplayFm();
+		if (null != display && !TextUtils.isEmpty(display.getFbet()) && display.getFbet().toLowerCase().contains(normalizedSearch)) {
+			return 3;
+		}
+
+		for (FM entry : mFM) {
+			if (!TextUtils.isEmpty(entry.getFben()) && entry.getFben().toLowerCase().contains(normalizedSearch)) {
+				return 4;
+			}
+		}
+
+		if (null != display && !TextUtils.isEmpty(display.getFben()) && display.getFben().toLowerCase().contains(normalizedSearch)) {
+			return 4;
+		}
+
+		return 5;
+	}
+
 	public Bundle toBundle() {
 		final Bundle bundle = new Bundle();
 		ArrayList<String> fbetList = new ArrayList<>(mFM.size());

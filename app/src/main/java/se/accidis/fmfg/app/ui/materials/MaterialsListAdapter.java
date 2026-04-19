@@ -113,6 +113,10 @@ public final class MaterialsListAdapter extends BaseAdapter implements Filterabl
 
 		@Override
 		public int compare(Material lhs, Material rhs) {
+			return compare(lhs, rhs, null);
+		}
+
+		public int compare(Material lhs, Material rhs, CharSequence search) {
 			boolean leftFav = mRepository.isFavoriteMaterial(lhs);
 			boolean rightFav = mRepository.isFavoriteMaterial(rhs);
 
@@ -120,6 +124,14 @@ public final class MaterialsListAdapter extends BaseAdapter implements Filterabl
 				return -1;
 			} else if (rightFav && !leftFav) {
 				return 1;
+			}
+
+			if (!TextUtils.isEmpty(search)) {
+				int leftPriority = lhs.getSearchPriority(search);
+				int rightPriority = rhs.getSearchPriority(search);
+				if (leftPriority != rightPriority) {
+					return leftPriority - rightPriority;
+				}
 			}
 
 			return getSortKey(lhs).compareTo(getSortKey(rhs));
@@ -147,7 +159,7 @@ public final class MaterialsListAdapter extends BaseAdapter implements Filterabl
 				}
 			}
 
-			Collections.sort(filteredList, mComparator);
+			Collections.sort(filteredList, new SearchMaterialsComparator(constraint));
 			results.values = filteredList;
 			results.count = filteredList.size();
 			return results;
@@ -167,6 +179,19 @@ public final class MaterialsListAdapter extends BaseAdapter implements Filterabl
 			} else {
 				notifyDataSetInvalidated();
 			}
+		}
+	}
+
+	private final class SearchMaterialsComparator implements Comparator<Material> {
+		private final CharSequence mSearch;
+
+		private SearchMaterialsComparator(CharSequence search) {
+			mSearch = search;
+		}
+
+		@Override
+		public int compare(Material lhs, Material rhs) {
+			return mComparator.compare(lhs, rhs, mSearch);
 		}
 	}
 }
