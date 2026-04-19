@@ -417,6 +417,18 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		return "1".equals(mMaterial.getKlass());
 	}
 
+	private int parsePackageCountOrZero(String str) {
+		try {
+			BigDecimal value = ValueHelper.parseValue(str);
+			if (value.compareTo(BigDecimal.ZERO) < 0) {
+				return 0;
+			}
+			return value.intValueExact();
+		} catch (ArithmeticException ignored) {
+			return 0;
+		}
+	}
+
 	public interface MaterialsLoadDialogListener {
 		void onDismiss();
 	}
@@ -467,16 +479,8 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			mNumberOfPackages = parseIntOrZero(s.toString());
+			mNumberOfPackages = parsePackageCountOrZero(s.toString());
 			calculate();
-		}
-
-		private int parseIntOrZero(String str) {
-			try {
-				return Integer.parseInt(str);
-			} catch (NumberFormatException ignored) {
-				return 0;
-			}
 		}
 	}
 
@@ -496,7 +500,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			Material rowMaterial = mCustomNEMMode ? mMaterial.withSelectedFmIndex(-1) : mMaterial;
 			DocumentRow row = new DocumentRow(rowMaterial);
 
-			int numberPkgs = parseIntOrZero(mNumberPkgsField.getText().toString());
+			int numberPkgs = parsePackageCountOrZero(mNumberPkgsField.getText().toString());
 			row.setNumberOfPackages(numberPkgs);
 			String typePkgs = mTypePkgsField.getText().toString().trim();
 			row.setTypeOfPackages(typePkgs);
@@ -523,13 +527,6 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			mRepository.commitCurrentDocument();
 		}
 
-		private int parseIntOrZero(String str) {
-			try {
-				return Integer.parseInt(str);
-			} catch (NumberFormatException ignored) {
-				return 0;
-			}
-		}
 	}
 
 	private final class WeightOrVolumeSelectedListener implements AdapterView.OnItemSelectedListener {

@@ -109,8 +109,8 @@
 			android:layout_width="96dp"
 			android:layout_column="1"
 			android:layout_row="3"
-			android:inputType="number"
-			android:maxLength="5" />
+			android:inputType="phone"
+			android:maxLength="20" />
 
 		<LinearLayout
 			style="@style/MaterialLoadRequiredHeading"
@@ -168,7 +168,7 @@
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
 				android:digits="0123456789,.+-*/ "
-				android:inputType="text"
+				android:inputType="phone"
 				android:maxLength="20" />
 
 			<Spinner
@@ -211,7 +211,7 @@
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
 				android:digits="0123456789,.+-*/ "
-				android:inputType="text"
+				android:inputType="phone"
 				android:maxLength="20" />
 
 			<TextView
@@ -259,7 +259,7 @@
 				android:layout_width="96dp"
 				android:layout_height="wrap_content"
 				android:digits="0123456789,.+-*/ "
-				android:inputType="text"
+				android:inputType="phone"
 				android:maxLength="24" />
 
 			<TextView
