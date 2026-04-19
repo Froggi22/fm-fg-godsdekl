@@ -9,6 +9,9 @@ import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import se.accidis.fmfg.app.R;
 import se.accidis.fmfg.app.model.Document;
@@ -19,9 +22,10 @@ import se.accidis.fmfg.app.model.Document;
 public final class ExportFile {
 	private static final String EXPORTED_DOC_DIRECTORY = "exported_doc";
 	private static final int EXPORTED_FILE_MAX_AGE_MS = 1000 * 60 * 60 * 24;
-	private static final String FILENAME_ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-";
+	private static final String DEFAULT_FILENAME_DATE_FORMAT = "yyyy_MM_dd";
+	private static final String FILENAME_ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ1234567890_-";
 	private static final String FILE_PROVIDER_AUTHORITY = "se.accidis.fmfg.fileprovider";
-	private static final char SEPARATOR_CHAR = '_';
+	private static final char REPLACEMENT_CHAR = '_';
 	private static final String TAG = ExportFile.class.getSimpleName();
 	private final File mFile;
 	private final String mFilename;
@@ -81,30 +85,36 @@ public final class ExportFile {
 	}
 
 	private static String createUniqueFilename(File baseDir, String documentName, String extension, String defaultName) {
-		if (!TextUtils.isEmpty(documentName)) {
-			documentName = sanitizeName(documentName.trim());
+		String baseName;
+		if (!TextUtils.isEmpty(documentName) && !TextUtils.isEmpty(documentName.trim())) {
+			baseName = sanitizeName(documentName.trim());
 		} else {
-			documentName = defaultName;
+			baseName = createDefaultName(defaultName);
 		}
 
-		String fileName = documentName + extension;
+		String fileName = baseName + extension;
 		File candidate = new File(baseDir, fileName);
 
 		// Add a counter to the filename, eventually we'll find one that is unused
 		int i = 1;
 		while (candidate.exists()) {
-			fileName = documentName + SEPARATOR_CHAR + String.valueOf(i++) + extension;
+			fileName = baseName + "(" + String.valueOf(i++) + ")" + extension;
 			candidate = new File(baseDir, fileName);
 		}
 
 		return fileName;
 	}
 
+	private static String createDefaultName(String defaultName) {
+		String date = new SimpleDateFormat(DEFAULT_FILENAME_DATE_FORMAT, Locale.US).format(new Date());
+		return sanitizeName(defaultName) + REPLACEMENT_CHAR + date;
+	}
+
 	private static String sanitizeName(String documentName) {
 		StringBuilder buffer = new StringBuilder(documentName);
 		for (int i = 0; i < buffer.length(); i++) {
 			if (-1 == FILENAME_ALLOWED_CHARS.indexOf(buffer.charAt(i))) {
-				buffer.setCharAt(i, SEPARATOR_CHAR);
+				buffer.setCharAt(i, REPLACEMENT_CHAR);
 			}
 		}
 		return buffer.toString();
