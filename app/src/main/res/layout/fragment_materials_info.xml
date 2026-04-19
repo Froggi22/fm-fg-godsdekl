@@ -173,14 +173,31 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp">
 
-                        <TextView
-                            android:id="@+id/material_tunnelkod_heading"
-                            style="@style/MaterialHeading"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_tunnelkod"/>
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/material_tunnelkod_heading"
+                                style="@style/MaterialHeading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="top"
+                                android:text="@string/material_tunnelkod"/>
+
+                            <ImageView
+                                android:id="@+id/material_tunnelkod_info"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginLeft="4dp"
+                                android:contentDescription="@string/material_tunnelkod_help"
+                                android:padding="2dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_info"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/material_tunnelkod"
@@ -197,13 +214,30 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp">
 
-                        <TextView
-                            style="@style/MaterialHeading"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_sarbest"/>
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/MaterialHeading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="top"
+                                android:text="@string/material_sarbest"/>
+
+                            <ImageView
+                                android:id="@+id/material_sarbest_info"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginLeft="4dp"
+                                android:contentDescription="@string/material_sarbest_help"
+                                android:padding="2dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_info"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/material_sarbest"
@@ -220,13 +254,30 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp">
 
-                        <TextView
-                            style="@style/MaterialHeading"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_begrmgd"/>
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/MaterialHeading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="top"
+                                android:text="@string/material_begrmgd"/>
+
+                            <ImageView
+                                android:id="@+id/material_begrmgd_info"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginLeft="4dp"
+                                android:contentDescription="@string/material_begrmgd_help"
+                                android:padding="2dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_info"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/material_begrmgd"
@@ -243,39 +294,33 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp">
 
-                        <TextView
-                            style="@style/MaterialHeading"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="12dp"
                             android:gravity="top"
-                            android:text="@string/material_redmgd"/>
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/MaterialHeading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="top"
+                                android:text="@string/material_redmgd"/>
+
+                            <ImageView
+                                android:id="@+id/material_redmgd_info"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginLeft="4dp"
+                                android:contentDescription="@string/material_redmgd_help"
+                                android:padding="2dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_info"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/material_redmgd"
-                            style="@style/MaterialLabel"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="top"/>
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/material_frpinstr_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="5dp">
-
-                        <TextView
-                            style="@style/MaterialHeading"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="12dp"
-                            android:gravity="top"
-                            android:text="@string/material_frpinstr"/>
-
-                        <TextView
-                            android:id="@+id/material_frpinstr"
                             style="@style/MaterialLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"

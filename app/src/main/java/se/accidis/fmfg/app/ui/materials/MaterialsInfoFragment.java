@@ -22,6 +22,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONArray;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ import se.accidis.fmfg.app.R;
 import se.accidis.fmfg.app.model.Document;
 import se.accidis.fmfg.app.model.DocumentRow;
 import se.accidis.fmfg.app.model.Material;
+import se.accidis.fmfg.app.services.AdrReferencesRepository;
 import se.accidis.fmfg.app.services.DocumentsRepository;
 import se.accidis.fmfg.app.services.LabelsRepository;
 import se.accidis.fmfg.app.ui.MainActivity;
@@ -38,9 +41,12 @@ import se.accidis.fmfg.app.ui.MainActivity;
  * Fragment showing information about a material.
  */
 public final class MaterialsInfoFragment extends Fragment implements MainActivity.HasNavigationItem {
+	private static final int TOOLTIP_MAX_LENGTH = 180;
+
 	private Button mChangeButton;
 	private Button mLoadButton;
 	private Material mMaterial;
+	private AdrReferencesRepository mReferencesRepository;
 	private Button mRemoveButton;
 	private DocumentsRepository mRepository;
 
@@ -64,6 +70,7 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		Bundle args = getArguments();
 		mMaterial = Material.fromBundle(args);
 		mRepository = DocumentsRepository.getInstance(getContext());
+		mReferencesRepository = AdrReferencesRepository.getInstance(getContext());
 
 		// Transportbenämning
 		TextView tpbenView = (TextView) view.findViewById(R.id.material_tpben);
@@ -88,7 +95,10 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		populateOptionalTextRow(view, R.id.material_sarbest_row, R.id.material_sarbest, joinValues(mMaterial.getSarbest()));
 		populateOptionalTextRow(view, R.id.material_begrmgd_row, R.id.material_begrmgd, mMaterial.getBegrMgd());
 		populateOptionalTextRow(view, R.id.material_redmgd_row, R.id.material_redmgd, mMaterial.getRedMgd());
-		populateOptionalTextRow(view, R.id.material_frpinstr_row, R.id.material_frpinstr, joinValues(mMaterial.getFrpInstr()));
+		initializeInfoDialog(view, R.id.material_tunnelkod_info, R.string.material_tunnelkod, createReferenceText(AdrReferencesRepository.SECTION_TUNNELKOD, mMaterial.getTunnelkod()));
+		initializeInfoDialog(view, R.id.material_sarbest_info, R.string.material_sarbest, createReferenceText(AdrReferencesRepository.SECTION_SARBEST, mMaterial.getSarbest()));
+		initializeInfoDialog(view, R.id.material_begrmgd_info, R.string.material_begrmgd, createReferenceText(AdrReferencesRepository.SECTION_BEGRMGD, mMaterial.getBegrMgd()));
+		initializeInfoDialog(view, R.id.material_redmgd_info, R.string.material_redmgd, createRedMgdReferenceText(mMaterial.getRedMgd()));
 
 		// Tunnelrestriktionskod
 		View tunnelKodRow = view.findViewById(R.id.material_tunnelkod_row);
@@ -150,6 +160,85 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 			return null;
 		}
 		return TextUtils.join(", ", values);
+	}
+
+	private String createReferenceText(String section, String code) {
+		if (TextUtils.isEmpty(code)) {
+			return "";
+		}
+
+		String reference = mReferencesRepository.getReference(section, code);
+		if (TextUtils.isEmpty(reference)) {
+			reference = getString(R.string.material_reference_missing, code);
+		}
+
+		return code + ": " + reference;
+	}
+
+	private String createReferenceText(String section, List<String> codes) {
+		if (null == codes || codes.isEmpty()) {
+			return "";
+		}
+
+		List<String> references = new ArrayList<>();
+		for (String code : codes) {
+			if (!TextUtils.isEmpty(code)) {
+				references.add(createReferenceText(section, code));
+			}
+		}
+
+		return TextUtils.join("\n\n", references);
+	}
+
+	private String createRedMgdReferenceText(String code) {
+		if (TextUtils.isEmpty(code)) {
+			return "";
+		}
+
+		Object reference = mReferencesRepository.getReferenceValue(AdrReferencesRepository.SECTION_REDMGD, code);
+		if (reference instanceof JSONArray) {
+			JSONArray limits = (JSONArray) reference;
+			if (2 == limits.length()) {
+				return code + ": "
+					+ "Högsta nettomängd per innerförpackning: " + limits.optString(0) + " g/ml. "
+					+ "Högsta nettomängd per ytterförpackning: " + limits.optString(1) + " g/ml.";
+			}
+		} else if (null != reference && !TextUtils.isEmpty(String.valueOf(reference))) {
+			return code + ": " + reference;
+		}
+
+		return code + ": " + getString(R.string.material_reference_missing, code);
+	}
+
+	private void initializeInfoDialog(View rootView, int infoId, final int titleId, final String message) {
+		View infoView = rootView.findViewById(infoId);
+		final String dialogMessage = (TextUtils.isEmpty(message) ? getString(R.string.material_no_data) : message);
+		String tooltipMessage = createTooltipText(dialogMessage);
+		infoView.setContentDescription(tooltipMessage);
+		infoView.setTooltipText(tooltipMessage);
+		infoView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(getActivity())
+					.setTitle(titleId)
+					.setMessage(dialogMessage)
+					.setPositiveButton(R.string.generic_close, null)
+					.show();
+			}
+		});
+	}
+
+	private String createTooltipText(String text) {
+		if (TextUtils.isEmpty(text) || text.length() <= TOOLTIP_MAX_LENGTH) {
+			return text;
+		}
+
+		int end = text.lastIndexOf(' ', TOOLTIP_MAX_LENGTH - 3);
+		if (end < TOOLTIP_MAX_LENGTH / 2) {
+			end = TOOLTIP_MAX_LENGTH - 3;
+		}
+
+		return text.substring(0, end).trim() + "...";
 	}
 
 	private void populateLabelsView(LinearLayout layout) {
