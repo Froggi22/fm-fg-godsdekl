@@ -98,7 +98,7 @@ public final class ColoadingHelper {
     }
 
     private static boolean containsClass1(DocumentRow row) {
-        List<String> etiketter = row.getMaterial().getEtiketter();
+        List<String> etiketter = row.getMaterial().getDisplayEtiketter();
         for (String kod : etiketter) {
             if (kod.startsWith(LABEL_1_PREFIX) && !kod.equals(LABEL_14S)) {
                 return true;
