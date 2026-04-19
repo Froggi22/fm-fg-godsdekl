@@ -130,10 +130,11 @@ public final class PdfGenerator {
 		StringBuilder materialBuilder = new StringBuilder();
 
 		Material material = row.getMaterial();
-		if (!TextUtils.isEmpty(material.getFben())) {
-			materialBuilder.append(material.getFben());
-			if (withFbet && !TextUtils.isEmpty(material.getFbet())) {
-				materialBuilder.insert(0, material.getFbet() + ' ');
+		Material.FM selectedFm = material.getSelectedFm();
+		if (null != selectedFm && !TextUtils.isEmpty(selectedFm.getFben())) {
+			materialBuilder.append(selectedFm.getFben());
+			if (withFbet && !TextUtils.isEmpty(selectedFm.getFbet())) {
+				materialBuilder.insert(0, selectedFm.getFbet() + ' ');
 			}
 		}
 

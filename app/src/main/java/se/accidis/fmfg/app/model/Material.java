@@ -52,15 +52,15 @@ public final class Material {
 	private final String mUuid;
 
 	public static Material createCustom(String tpben, List<String> etiketter, String uuid) {
-		return new Material(Collections.<FM>emptyList(), "", tpben, etiketter, NO_FM_SELECTED, false, TPKAT_NONE, "", "", "", "", false, false, true, uuid);
+		return new Material(Collections.<FM>emptyList(), "", tpben, etiketter, NO_FM_SELECTED, false, TPKAT_NONE, "", "", "", "", false, false, true, uuid, false);
 	}
 
-	private Material(List<FM> fm, String unNr, String tpben, List<String> etiketter, int selectedFmIndex, boolean hasPresetNEM, int tpKat, String frpGrp, String klass, String klassKod, String tunnelKod, boolean miljo, boolean miljoDefined, boolean isCustom, String uuid) {
+	private Material(List<FM> fm, String unNr, String tpben, List<String> etiketter, int selectedFmIndex, boolean hasPresetNEM, int tpKat, String frpGrp, String klass, String klassKod, String tunnelKod, boolean miljo, boolean miljoDefined, boolean isCustom, String uuid, boolean selectDefaultFm) {
 		List<FM> fmList = (null != fm) ? fm : Collections.<FM>emptyList();
 		mFM = Collections.unmodifiableList(new ArrayList<>(fmList));
 		int fmIndex = sanitizeSelectedFmIndex(selectedFmIndex, mFM);
 		int selectedNEMmg = getNEMmgFromSelection(mFM, fmIndex);
-		if (NO_FM_SELECTED == fmIndex && !mFM.isEmpty()) {
+		if (selectDefaultFm && NO_FM_SELECTED == fmIndex && !mFM.isEmpty()) {
 			fmIndex = 0;
 			selectedNEMmg = getNEMmgFromSelection(mFM, fmIndex);
 		}
@@ -110,13 +110,14 @@ public final class Material {
 		final String[] etiketterArray = bundle.getStringArray(Keys.ETIKETTER);
 		final List<String> etiketter = (null != etiketterArray ? Arrays.asList(etiketterArray) : new ArrayList<String>(0));
 
-		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, uuid);
+		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, uuid, false);
 	}
 
 	public static Material fromJSON(JSONObject json) throws JSONException {
 		final List<FM> fm = getFbetFbenFromJson(json);
 		final String unNr = JSONUtils.getStringOrNull(json, Keys.UNNR);
 		final String tpben = json.getString(Keys.TPBEN);
+		final boolean hasSelectedFmIndex = json.has(Keys.FM_SELECTED_INDEX);
 		final int selectedFmIndex = json.optInt(Keys.FM_SELECTED_INDEX, NO_FM_SELECTED);
 		final boolean hasPresetNEM = !fm.isEmpty();
 		final int tpKat = json.isNull(Keys.TPKAT) ? TPKAT_NONE : json.optInt(Keys.TPKAT, TPKAT_NONE);
@@ -136,7 +137,7 @@ public final class Material {
 			}
 		}
 
-		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, null);
+		return new Material(fm, unNr, tpben, etiketter, selectedFmIndex, hasPresetNEM, tpKat, frpGrp, klass, klassKod, tunnelkod, miljo, miljoDefined, isCustom, null, !hasSelectedFmIndex);
 	}
 
 	private static List<FM> getFbetFbenFromBundle(Bundle bundle) {
@@ -279,7 +280,7 @@ public final class Material {
 		if (sanitizedIndex == mSelectedFmIndex) {
 			return this;
 		}
-		return new Material(mFM, mUNnr, mTpben, mEtiketter, sanitizedIndex, mHasPresetNEM, mTpKat, mFrpGrp, mKlass, mKlassKod, mTunnelkod, mMiljo, mMiljoDefined, mIsCustom, (mIsCustom ? mUuid : null));
+		return new Material(mFM, mUNnr, mTpben, mEtiketter, sanitizedIndex, mHasPresetNEM, mTpKat, mFrpGrp, mKlass, mKlassKod, mTunnelkod, mMiljo, mMiljoDefined, mIsCustom, (mIsCustom ? mUuid : null), false);
 	}
 
 	public int getTpKat() {
@@ -369,9 +370,7 @@ public final class Material {
 		json.put(Keys.TPBEN, mTpben);
 		json.put(Keys.ETIKETTER, new JSONArray(mEtiketter));
 		json.put(Keys.HAS_NEM, mHasPresetNEM);
-		if (NO_FM_SELECTED != mSelectedFmIndex) {
-			json.put(Keys.FM_SELECTED_INDEX, mSelectedFmIndex);
-		}
+		json.put(Keys.FM_SELECTED_INDEX, mSelectedFmIndex);
 		json.put(Keys.TPKAT, mTpKat);
 		json.put(Keys.FRPGRP, mFrpGrp);
 		json.put(Keys.KLASS, mKlass);

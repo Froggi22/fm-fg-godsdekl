@@ -23,6 +23,7 @@ import androidx.fragment.app.DialogFragment;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 import se.accidis.fmfg.app.R;
@@ -76,6 +77,9 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			mMaterial = row.getMaterial();
 			mSelectedFmIndex = mMaterial.getSelectedFmIndex();
 			mDocumentTotalValue = mDocumentTotalValue.subtract(row.getCalculatedValue());
+		} else {
+			mSelectedFmIndex = -1;
+			mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
 		}
 
 		int multiplier = ValueHelper.getMultiplierByTpKat(mMaterial.getTpKat());
@@ -177,7 +181,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		List<Material.FM> fmEntries = mMaterial.getFM();
 
 		if (fmEntries.size() > 1) {
-			ArrayAdapter<Material.FM> adapter = new ArrayAdapter<Material.FM>(getContext(), R.layout.spinner_two_line_item, fmEntries) {
+			List<Material.FM> spinnerEntries = new ArrayList<>(fmEntries.size() + 1);
+			spinnerEntries.add(null);
+			spinnerEntries.addAll(fmEntries);
+			ArrayAdapter<Material.FM> adapter = new ArrayAdapter<Material.FM>(getContext(), R.layout.spinner_two_line_item, spinnerEntries) {
 				@NonNull
 				@Override
 				public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -196,9 +203,16 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 						row = inflater.inflate(layoutResource, parent, false);
 					}
 					Material.FM entry = getItem(position);
-					if (null != entry) {
-						TextView line1 = (TextView) row.findViewById(R.id.fm_spinner_line1);
-						TextView line2 = (TextView) row.findViewById(R.id.fm_spinner_line2);
+					TextView line1 = (TextView) row.findViewById(R.id.fm_spinner_line1);
+					TextView line2 = (TextView) row.findViewById(R.id.fm_spinner_line2);
+					if (null == entry) {
+						if (null != line1) {
+							line1.setText(R.string.material_load_fm_none);
+						}
+						if (null != line2) {
+							line2.setText("");
+						}
+					} else {
 						if (null != line1) {
 							line1.setText(entry.getFbet() + " " + entry.getFben());
 						}
@@ -211,9 +225,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 				}
 			};
 			mFmSpinner.setAdapter(adapter);
-			int initialSelection = (mSelectedFmIndex >= 0 && mSelectedFmIndex < fmEntries.size()) ? mSelectedFmIndex : 0;
-			mSelectedFmIndex = initialSelection;
-			mMaterial = mMaterial.withSelectedFmIndex(initialSelection);
+			int initialSelection = (mSelectedFmIndex >= 0 && mSelectedFmIndex < fmEntries.size()) ? mSelectedFmIndex + 1 : 0;
 			mFmSpinner.setSelection(initialSelection);
 			mFmSpinner.setOnItemSelectedListener(new FmSelectedListener());
 			fmHeading.setVisibility(View.VISIBLE);
@@ -286,9 +298,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private final class FmSelectedListener implements AdapterView.OnItemSelectedListener {
 		@Override
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-			if (position != mSelectedFmIndex) {
-				mSelectedFmIndex = position;
-				mMaterial = mMaterial.withSelectedFmIndex(position);
+			int selectedFmIndex = position - 1;
+			if (selectedFmIndex != mSelectedFmIndex) {
+				mSelectedFmIndex = selectedFmIndex;
+				mMaterial = mMaterial.withSelectedFmIndex(selectedFmIndex);
 				calculate();
 			}
 		}

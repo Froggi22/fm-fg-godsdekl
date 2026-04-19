@@ -278,8 +278,8 @@ public final class DocumentAdapter extends BaseAdapter {
 		StringBuilder materialBuilder = new StringBuilder();
 		Material material = row.getMaterial();
 		Material.FM selectedFm = material.getSelectedFm();
-		String fbet = (null != selectedFm && !TextUtils.isEmpty(selectedFm.getFbet())) ? selectedFm.getFbet() : material.getFbet();
-		String fben = (null != selectedFm && !TextUtils.isEmpty(selectedFm.getFben())) ? selectedFm.getFben() : material.getFben();
+		String fbet = (null != selectedFm) ? selectedFm.getFbet() : null;
+		String fben = (null != selectedFm) ? selectedFm.getFben() : null;
 
 		if (!TextUtils.isEmpty(fben)) {
 			materialBuilder.append(fben);
