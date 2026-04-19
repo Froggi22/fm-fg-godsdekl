@@ -64,8 +64,9 @@
     <string name="document_export_warning_total_value_continue">Fortsätt exportera</string>
     <string name="document_warning_label61">Varning! Kollin försedda med etikett 6.1 får inte staplas eller stuvas närmare än 0,8 meter från kollin som innehåller livsmedel. Alternativt ska kollin med etikett 6.1 och kollin med livsmedel hållas fullständigt avskärmade från varandra.</string>
     <string name="document_warning_restricted_explosive_nem">Varning! För UN 0081, 0082, 0084, 0241, 0331, 0332 och 0482 får total NEM per transportenhet vara högst 50 kg.</string>
-    <string name="document_warning_class1_line1">Varning! Klass 1 får normalt inte lastas med andra klasser, med undantag för 1.4S. Kontrollera även samlastningsgrupperna.</string>
+    <string name="document_warning_class1_line1">Varning! Klass 1 får normalt inte lastas med andra klasser, med undantag för 1.4S.</string>
     <string name="document_warning_class1_line2">Tänk på att om du lastar farligt gods på ett separat fordon så måste du upprätta en separat godsdeklaration för det fordonet.</string>
+    <string name="document_warning_coloading_comment_disallowed">Samlastning klass 1: Kombinationen av samhanteringsgrupper är inte tillåten.</string>
     <string name="document_warning_coloading_comment_1">Samlastning klass 1 (1): Grupp B och D får bara samlastas om de är effektivt åtskilda så att detonation inte kan överföras. Separationen ska ske med skilda utrymmen eller särskilt inneslutningssystem och vara godkänd av behörig myndighet.</string>
     <string name="document_warning_coloading_comment_2">Samlastning klass 1 (2): Tillåts inte vid järnvägstransport.</string>
     <string name="document_warning_coloading_comment_3">Samlastning klass 1 (3): Olika föremål i klass 1.6N får bara samlastas som 1.6N om provning eller analogislutsats visar att ingen extra detonationsrisk genom överföring finns. Annars ska de behandlas som riskgrupp 1.1.</string>

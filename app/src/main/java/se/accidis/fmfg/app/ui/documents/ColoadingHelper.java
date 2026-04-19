@@ -17,6 +17,7 @@ import se.accidis.fmfg.app.model.Material;
  * Simple helper class for validating if a document is in compliance with co-loading rules.
  */
 public final class ColoadingHelper {
+    private static final String CLASS_1 = "1";
     private static final String LABEL_14S = "1.4S";
     private static final String LABEL_1_PREFIX = "1";
     private static final Character[] COHANDLING_GROUPS = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'L', 'N', 'S'};
@@ -47,13 +48,30 @@ public final class ColoadingHelper {
     }
 
     public static boolean isViolationOfColoadingRules(Document document) {
+        return isClass1LoadedWithOtherClasses(document) || hasColoadingGroupConflict(document);
+    }
+
+    public static boolean isClass1LoadedWithOtherClasses(Document document) {
+        boolean containsRestrictedClass1 = false, containsNonClass1 = false;
+        for (DocumentRow row : document.getRows()) {
+            boolean rowContainsClass1 = containsClass1(row);
+            containsRestrictedClass1 = (containsRestrictedClass1 || (rowContainsClass1 && !isClass14S(row)));
+            containsNonClass1 = (containsNonClass1 || !rowContainsClass1);
+            if (containsRestrictedClass1 && containsNonClass1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasColoadingGroupConflict(Document document) {
         return getColoadingResult(document).requiresWarning();
     }
 
     public static String getColoadingWarningText(Document document, Context context) {
         ColoadingResult result = getColoadingResult(document);
         if (result.getCommentNumbers().isEmpty()) {
-            return context.getString(R.string.document_warning_class1_line2);
+            return result.requiresWarning() ? context.getString(R.string.document_warning_coloading_comment_disallowed) : "";
         }
 
         StringBuilder builder = new StringBuilder();
@@ -85,14 +103,10 @@ public final class ColoadingHelper {
     }
 
     private static ColoadingResult getColoadingResult(Document document) {
-        boolean containsRestrictedClass1 = false, containsNonClass1 = false;
+        boolean containsRestrictedClass1 = false;
         for (DocumentRow row : document.getRows()) {
             boolean rowContainsClass1 = containsClass1(row);
             containsRestrictedClass1 = (containsRestrictedClass1 || (rowContainsClass1 && !isClass14S(row)));
-            containsNonClass1 = (containsNonClass1 || !rowContainsClass1);
-            if (containsRestrictedClass1 && containsNonClass1) {
-                return ColoadingResult.warning();
-            }
         }
 
         if (containsRestrictedClass1) {
@@ -111,9 +125,9 @@ public final class ColoadingHelper {
     }
 
     private static boolean hasDisallowedCohandlingGroupCombination(List<Character> cohandlingGroups) {
-        for (Character group : cohandlingGroups) {
-            for (Character otherGroup : cohandlingGroups) {
-                if (getColoadingRule(group, otherGroup).requiresWarning()) {
+        for (int i = 0; i < cohandlingGroups.size(); i++) {
+            for (int j = i + 1; j < cohandlingGroups.size(); j++) {
+                if (getColoadingRule(cohandlingGroups.get(i), cohandlingGroups.get(j)).requiresWarning()) {
                     return true;
                 }
             }
@@ -123,9 +137,17 @@ public final class ColoadingHelper {
 
     private static Set<Integer> getWarningCommentNumbers(List<Character> cohandlingGroups) {
         Set<Integer> result = new LinkedHashSet<>();
-        for (Character group : cohandlingGroups) {
-            for (Character otherGroup : cohandlingGroups) {
-                result.addAll(getColoadingRule(group, otherGroup).getCommentNumbers());
+        for (int i = 0; i < cohandlingGroups.size(); i++) {
+            for (int j = i + 1; j < cohandlingGroups.size(); j++) {
+                Character group = cohandlingGroups.get(i);
+                Character otherGroup = cohandlingGroups.get(j);
+                ColoadingRule rule = getColoadingRule(group, otherGroup);
+                result.addAll(rule.getCommentNumbers());
+                if (rule.requiresWarning()
+                        && rule.getCommentNumbers().isEmpty()
+                        && (Character.valueOf('L').equals(group) || Character.valueOf('L').equals(otherGroup))) {
+                    result.add(5);
+                }
             }
         }
         return result;
@@ -152,9 +174,12 @@ public final class ColoadingHelper {
 
     private static boolean containsClass1(DocumentRow row) {
         Material material = row.getMaterial();
-        String klassKod = material.getKlassKod();
-        if (!TextUtils.isEmpty(klassKod) && klassKod.startsWith(LABEL_1_PREFIX)) {
+        if (CLASS_1.equals(material.getKlass())) {
             return true;
+        }
+
+        if (!TextUtils.isEmpty(material.getKlass())) {
+            return false;
         }
 
         List<String> etiketter = material.getDisplayEtiketter();
@@ -168,8 +193,12 @@ public final class ColoadingHelper {
 
     private static boolean isClass14S(DocumentRow row) {
         Material material = row.getMaterial();
-        if (LABEL_14S.equals(material.getKlassKod())) {
+        if (CLASS_1.equals(material.getKlass()) && LABEL_14S.equals(material.getKlassKod())) {
             return true;
+        }
+
+        if (!TextUtils.isEmpty(material.getKlass())) {
+            return false;
         }
 
         return material.getDisplayEtiketter().contains(LABEL_14S);
@@ -178,7 +207,10 @@ public final class ColoadingHelper {
     private static List<Character> getCohandlingGroups(List<DocumentRow> rows) {
         List<Character> result = new ArrayList<>();
         for (DocumentRow row : rows) {
-            addCohandlingGroup(result, row.getMaterial().getKlassKod());
+            Material material = row.getMaterial();
+            if (CLASS_1.equals(material.getKlass())) {
+                addCohandlingGroup(result, material.getKlassKod());
+            }
         }
         return result;
     }
@@ -189,7 +221,7 @@ public final class ColoadingHelper {
         }
 
         char cohandlingGroup = kod.charAt(kod.length() - 1);
-        if (Character.isLetter(cohandlingGroup) && !result.contains(cohandlingGroup)) {
+        if (Character.isLetter(cohandlingGroup)) {
             result.add(cohandlingGroup);
         }
     }

@@ -338,11 +338,15 @@ public final class DocumentAdapter extends BaseAdapter {
 		View warningRestrictedExplosiveNemView = view.findViewById(R.id.document_warning_restricted_explosive_nem);
 		warningRestrictedExplosiveNemView.setVisibility(mDocument.hasRestrictedExplosiveNemAbove50Kg() ? View.VISIBLE : View.GONE);
 
-		boolean isViolatingColoadingRules = ColoadingHelper.isViolationOfColoadingRules(mDocument);
+		boolean isClass1LoadedWithOtherClasses = ColoadingHelper.isClass1LoadedWithOtherClasses(mDocument);
+		boolean hasColoadingGroupConflict = ColoadingHelper.hasColoadingGroupConflict(mDocument);
 		View warningClass1View = view.findViewById(R.id.document_warning_class1);
-		warningClass1View.setVisibility(isViolatingColoadingRules ? View.VISIBLE : View.GONE);
+		warningClass1View.setVisibility((isClass1LoadedWithOtherClasses || hasColoadingGroupConflict) ? View.VISIBLE : View.GONE);
+		TextView warningClass1Line1View = (TextView) view.findViewById(R.id.document_warning_class1_line1);
+		warningClass1Line1View.setVisibility(isClass1LoadedWithOtherClasses ? View.VISIBLE : View.GONE);
 		TextView warningClass1Line2View = (TextView) view.findViewById(R.id.document_warning_class1_line2);
-		warningClass1Line2View.setText(ColoadingHelper.getColoadingWarningText(mDocument, mContext));
+		warningClass1Line2View.setVisibility(hasColoadingGroupConflict ? View.VISIBLE : View.GONE);
+		warningClass1Line2View.setText(hasColoadingGroupConflict ? ColoadingHelper.getColoadingWarningText(mDocument, mContext) : "");
 
 		return view;
 	}
