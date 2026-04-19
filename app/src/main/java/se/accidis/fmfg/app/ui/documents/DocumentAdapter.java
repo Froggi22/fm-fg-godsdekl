@@ -305,7 +305,7 @@ public final class DocumentAdapter extends BaseAdapter {
 			}
 		}
 
-		if (row.hasNEM()) {
+		if (row.usesAmountForNEM()) {
 			if (materialBuilder.length() > 0) {
 				materialBuilder.append(' ');
 			}

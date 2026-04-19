@@ -144,6 +144,10 @@ public final class DocumentRow {
 		return Keys.CUSTOM_NEM_UNIT_PACKAGE.equals(mCustomNEMUnit);
 	}
 
+	public boolean usesAmountForNEM() {
+		return hasNEM() && !(null != mCustomNEMmg && isCustomNEMPerPackage() && !mMaterial.hasNEM());
+	}
+
 	public void setCustomNEMPerPackage(boolean customNEMPerPackage) {
 		mCustomNEMUnit = customNEMPerPackage ? Keys.CUSTOM_NEM_UNIT_PACKAGE : Keys.CUSTOM_NEM_UNIT_AMOUNT;
 	}

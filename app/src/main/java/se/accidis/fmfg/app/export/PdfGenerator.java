@@ -146,7 +146,7 @@ public final class PdfGenerator {
 			}
 		}
 
-		if (row.hasNEM()) {
+		if (row.usesAmountForNEM()) {
 			if (materialBuilder.length() > 0) {
 				materialBuilder.append(' ');
 			}
