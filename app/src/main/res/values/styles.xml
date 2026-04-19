@@ -179,4 +179,21 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">16sp</item>
     </style>
+
+	<style name="MaterialLoadRequiredMarker">
+		<item name="android:layout_gravity">center_vertical</item>
+		<item name="android:layout_marginLeft">4dp</item>
+		<item name="android:textColor">@color/red</item>
+		<item name="android:textSize">14sp</item>
+	</style>
+
+	<style name="MaterialLoadRequiredHeading">
+		<item name="android:layout_gravity">right|center_vertical</item>
+		<item name="android:layout_marginRight">5dp</item>
+	</style>
+
+	<style name="MaterialLoadRequiredHeadingText">
+		<item name="android:textColor">@color/black</item>
+		<item name="android:textSize">14sp</item>
+	</style>
 </resources>

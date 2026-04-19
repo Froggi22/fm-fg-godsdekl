@@ -11,13 +11,28 @@
 		android:paddingRight="@dimen/dialog_horizontal_margin"
 		android:paddingTop="@dimen/dialog_vertical_margin">
 
-		<TextView
+		<LinearLayout
 			android:id="@+id/material_load_fm_heading"
-			style="@style/DialogHeading"
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="0"
-			android:text="@string/material_load_fm"
-			android:visibility="gone" />
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_fm" />
+
+			<TextView
+				android:id="@+id/material_load_fm_required"
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*"
+				android:visibility="gone" />
+		</LinearLayout>
 
 		<Spinner
 			android:id="@+id/material_load_fm_spinner"
@@ -27,11 +42,24 @@
 			android:layout_row="0"
 			android:visibility="gone" />
 
-		<TextView
-			style="@style/DialogHeading"
+		<LinearLayout
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="1"
-			android:text="@string/material_load_num_pkgs" />
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_num_pkgs" />
+
+			<TextView
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*" />
+		</LinearLayout>
 
 		<EditText
 			android:id="@+id/material_load_number_pkgs"
@@ -41,11 +69,24 @@
 			android:inputType="number"
 			android:maxLength="5" />
 
-		<TextView
-			style="@style/DialogHeading"
+		<LinearLayout
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="2"
-			android:text="@string/material_load_type_pkgs" />
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_type_pkgs" />
+
+			<TextView
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*" />
+		</LinearLayout>
 
 		<AutoCompleteTextView
 			android:id="@+id/material_load_type_pkgs"
@@ -54,11 +95,24 @@
 			android:layout_row="2"
 			android:inputType="text" />
 
-		<TextView
-			style="@style/DialogHeading"
+		<LinearLayout
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="3"
-			android:text="@string/material_load_weight_volume" />
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_weight_volume" />
+
+			<TextView
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*" />
+		</LinearLayout>
 
 		<LinearLayout
 			android:layout_column="1"
@@ -78,12 +132,27 @@
 				android:layout_height="match_parent" />
 		</LinearLayout>
 
-		<TextView
+		<LinearLayout
 			android:id="@+id/material_load_amount_heading"
-			style="@style/DialogHeading"
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_row="4"
-			android:text="@string/material_load_amount" />
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_amount" />
+
+			<TextView
+				android:id="@+id/material_load_amount_required"
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*"
+				android:visibility="gone" />
+		</LinearLayout>
 
 		<LinearLayout
 			android:id="@+id/material_load_amount_layout"
@@ -107,13 +176,28 @@
 				android:textSize="18sp" />
 		</LinearLayout>
 
-		<TextView
+		<LinearLayout
 			android:id="@+id/material_load_custom_nem_heading"
-			style="@style/DialogHeading"
+			style="@style/MaterialLoadRequiredHeading"
 			android:layout_column="0"
 			android:layout_marginTop="5dp"
 			android:layout_row="5"
-			android:text="@string/material_load_nem_custom" />
+			android:orientation="horizontal">
+
+			<TextView
+				style="@style/MaterialLoadRequiredHeadingText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/material_load_nem_custom" />
+
+			<TextView
+				android:id="@+id/material_load_custom_nem_required"
+				style="@style/MaterialLoadRequiredMarker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="*"
+				android:visibility="gone" />
+		</LinearLayout>
 
 		<LinearLayout
 			android:id="@+id/material_load_custom_nem_layout"

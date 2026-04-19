@@ -40,9 +40,12 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private static final BigDecimal MG_PER_KG = new BigDecimal(1000000);
 
 	private BigDecimal mAmount;
+	private View mAmountRequiredMarker;
 	private EditText mCustomNEMField;
+	private View mCustomNEMRequiredMarker;
 	private BigDecimal mCustomNEMkg;
 	private BigDecimal mDocumentTotalValue;
+	private View mFmRequiredMarker;
 	private Spinner mFmSpinner;
 	private CheckBox mMiljoCheckbox;
 	private MaterialsLoadDialogListener mListener;
@@ -87,6 +90,9 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 		@SuppressLint("InflateParams")
 		View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_material_load, null);
+		mAmountRequiredMarker = view.findViewById(R.id.material_load_amount_required);
+		mCustomNEMRequiredMarker = view.findViewById(R.id.material_load_custom_nem_required);
+		mFmRequiredMarker = view.findViewById(R.id.material_load_fm_required);
 		initializeFmSpinner(view);
 		TextView multiplierView = (TextView) view.findViewById(R.id.material_load_multiplier);
 		multiplierView.setText(String.valueOf(multiplier));
@@ -111,6 +117,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			amountField.setText(String.valueOf(row.getAmount()));
 			mAmount = row.getAmount();
 		}
+		mAmountRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
 
 		mCustomNEMField = (EditText) view.findViewById(R.id.material_load_custom_nem);
 		View customNEMHeading = view.findViewById(R.id.material_load_custom_nem_heading);
@@ -118,9 +125,11 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		if (mMaterial.hasPresetNEMValue()) {
 			customNEMHeading.setVisibility(View.GONE);
 			customNEMLayout.setVisibility(View.GONE);
+			mCustomNEMRequiredMarker.setVisibility(View.GONE);
 		} else {
 			customNEMHeading.setVisibility(View.VISIBLE);
 			customNEMLayout.setVisibility(View.VISIBLE);
+			mCustomNEMRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
 			mCustomNEMField.addTextChangedListener(new CustomNEMChangedListener());
 			if (null != row && null != row.getCustomNEMmg()) {
 				mCustomNEMkg = row.getCustomNEMmg().divide(MG_PER_KG, 6, BigDecimal.ROUND_FLOOR);
@@ -230,6 +239,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			mFmSpinner.setOnItemSelectedListener(new FmSelectedListener());
 			fmHeading.setVisibility(View.VISIBLE);
 			mFmSpinner.setVisibility(View.VISIBLE);
+			mFmRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
 		} else {
 			if (1 == fmEntries.size()) {
 				mSelectedFmIndex = 0;
@@ -241,6 +251,7 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			if (null != mFmSpinner) {
 				mFmSpinner.setVisibility(View.GONE);
 			}
+			mFmRequiredMarker.setVisibility(View.GONE);
 		}
 	}
 
@@ -289,6 +300,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			return mCustomNEMkg;
 		}
 		return null;
+	}
+
+	private boolean isClass1() {
+		return "1".equals(mMaterial.getKlass());
 	}
 
 	public interface MaterialsLoadDialogListener {
