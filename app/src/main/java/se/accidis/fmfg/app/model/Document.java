@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,16 @@ import se.accidis.fmfg.app.utils.JSONUtils;
  */
 public final class Document {
 	private static final BigDecimal ADR_LIMIT_TOTAL_VALUE = new BigDecimal(1000);
+	private static final BigDecimal RESTRICTED_EXPLOSIVE_NEM_LIMIT_KG = new BigDecimal(50);
+	private static final Set<String> RESTRICTED_EXPLOSIVE_NEM_UN_NUMBERS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+		"0081",
+		"0082",
+		"0084",
+		"0241",
+		"0331",
+		"0332",
+		"0482"
+	)));
 	private final List<DocumentRow> mRows = new ArrayList<>();
 	private String mAuthor;
 	private boolean mHasUnsavedChanges;
@@ -258,6 +269,16 @@ public final class Document {
 			}
 		}
 		return false;
+	}
+
+	public boolean hasRestrictedExplosiveNemAbove50Kg() {
+		BigDecimal totalNEM = BigDecimal.ZERO;
+		for (DocumentRow row : mRows) {
+			if (RESTRICTED_EXPLOSIVE_NEM_UN_NUMBERS.contains(row.getMaterial().getUNnr())) {
+				totalNEM = totalNEM.add(row.getNEMkg());
+			}
+		}
+		return totalNEM.compareTo(RESTRICTED_EXPLOSIVE_NEM_LIMIT_KG) > 0;
 	}
 
 	public boolean hasTotalValueAboveAdrLimit() {

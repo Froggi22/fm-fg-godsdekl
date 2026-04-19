@@ -335,6 +335,9 @@ public final class DocumentAdapter extends BaseAdapter {
 		View warningLabel61View = view.findViewById(R.id.document_warning_label61);
 		warningLabel61View.setVisibility(mDocument.hasLabel(LABEL_61) ? View.VISIBLE : View.GONE);
 
+		View warningRestrictedExplosiveNemView = view.findViewById(R.id.document_warning_restricted_explosive_nem);
+		warningRestrictedExplosiveNemView.setVisibility(mDocument.hasRestrictedExplosiveNemAbove50Kg() ? View.VISIBLE : View.GONE);
+
 		boolean isViolatingColoadingRules = ColoadingHelper.isViolationOfColoadingRules(mDocument);
 		View warningClass1View = view.findViewById(R.id.document_warning_class1);
 		warningClass1View.setVisibility(isViolatingColoadingRules ? View.VISIBLE : View.GONE);
