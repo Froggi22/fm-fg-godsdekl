@@ -103,6 +103,14 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 			klassKodView.setText(R.string.material_no_data);
 		}
 
+		// Förpackningsgrupp
+		TextView frpGrpView = (TextView) view.findViewById(R.id.material_frpgrp);
+		if (!TextUtils.isEmpty(mMaterial.getFrpGrp())) {
+			frpGrpView.setText(mMaterial.getFrpGrp());
+		} else {
+			frpGrpView.setText(R.string.material_no_data);
+		}
+
 		populateOptionalTextRow(view, R.id.material_sarbest_row, R.id.material_sarbest, joinValues(mMaterial.getSarbest()));
 		populateOptionalTextRow(view, R.id.material_begrmgd_row, R.id.material_begrmgd, mMaterial.getBegrMgd());
 		populateOptionalTextRow(view, R.id.material_redmgd_row, R.id.material_redmgd, mMaterial.getRedMgd());

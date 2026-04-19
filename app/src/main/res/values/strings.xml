@@ -104,6 +104,7 @@
     <string name="material_begrmgd_help">Anger största tillåtna mängd per innerförpackning för transport enligt begränsad mängd. Värdet 0 betyder att undantaget inte får användas för godset.</string>
     <string name="material_fm">Militära Benämningar</string>
     <string name="material_etiketter">Etiketter</string>
+    <string name="material_frpgrp">Förpackningsgrupp</string>
     <string name="material_klasskod">Klassificeringskod</string>
     <string name="material_load">Lasta</string>
     <string name="material_load_new">Lasta ny</string>
