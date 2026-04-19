@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -214,14 +216,15 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		View infoView = rootView.findViewById(infoId);
 		final String dialogMessage = (TextUtils.isEmpty(message) ? getString(R.string.material_no_data) : message);
 		String tooltipMessage = createTooltipText(dialogMessage);
+		final CharSequence styledDialogMessage = createBoldCodeText(dialogMessage);
 		infoView.setContentDescription(tooltipMessage);
-		infoView.setTooltipText(tooltipMessage);
+		infoView.setTooltipText(createBoldCodeText(tooltipMessage));
 		infoView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				new AlertDialog.Builder(getActivity())
 					.setTitle(titleId)
-					.setMessage(dialogMessage)
+					.setMessage(styledDialogMessage)
 					.setPositiveButton(R.string.generic_close, null)
 					.show();
 			}
@@ -239,6 +242,30 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 		}
 
 		return text.substring(0, end).trim() + "...";
+	}
+
+	private CharSequence createBoldCodeText(String text) {
+		if (TextUtils.isEmpty(text)) {
+			return text;
+		}
+
+		SpannableStringBuilder builder = new SpannableStringBuilder(text);
+		int start = 0;
+		while (start < builder.length()) {
+			int end = TextUtils.indexOf(builder, ':', start);
+			if (end < 0) {
+				break;
+			}
+
+			builder.setSpan(new StyleSpan(Typeface.BOLD), start, end + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+			int next = TextUtils.indexOf(builder, "\n\n", end + 1);
+			if (next < 0) {
+				break;
+			}
+			start = next + 2;
+		}
+
+		return builder;
 	}
 
 	private void populateLabelsView(LinearLayout layout) {
