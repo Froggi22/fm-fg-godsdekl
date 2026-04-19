@@ -14,16 +14,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 
 import se.accidis.fmfg.app.R;
@@ -42,9 +43,14 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private BigDecimal mAmount;
 	private View mAmountRequiredMarker;
 	private EditText mCustomNEMField;
+	private View mCustomNEMHeading;
+	private View mCustomNEMLayout;
 	private View mCustomNEMRequiredMarker;
+	private SwitchCompat mCustomNEMToggle;
 	private BigDecimal mCustomNEMkg;
+	private boolean mCustomNEMMode;
 	private BigDecimal mDocumentTotalValue;
+	private View mFmHeading;
 	private View mFmRequiredMarker;
 	private Spinner mFmSpinner;
 	private CheckBox mMiljoCheckbox;
@@ -91,9 +97,20 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		@SuppressLint("InflateParams")
 		View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_material_load, null);
 		mAmountRequiredMarker = view.findViewById(R.id.material_load_amount_required);
+		mCustomNEMField = (EditText) view.findViewById(R.id.material_load_custom_nem);
+		mCustomNEMHeading = view.findViewById(R.id.material_load_custom_nem_heading);
+		mCustomNEMLayout = view.findViewById(R.id.material_load_custom_nem_layout);
 		mCustomNEMRequiredMarker = view.findViewById(R.id.material_load_custom_nem_required);
+		mCustomNEMToggle = (SwitchCompat) view.findViewById(R.id.material_load_custom_nem_toggle);
+		mFmHeading = view.findViewById(R.id.material_load_fm_heading);
 		mFmRequiredMarker = view.findViewById(R.id.material_load_fm_required);
+		mValueView = (TextView) view.findViewById(R.id.material_load_value);
+		mTotalValueView = (TextView) view.findViewById(R.id.material_load_total_value);
+		mNEMView = (TextView) view.findViewById(R.id.material_load_nem);
+		mCustomNEMMode = (null != row && null != row.getCustomNEMmg() && canToggleCustomNEMMode());
 		initializeFmSpinner(view);
+		initializeCustomNEMInput(row);
+		initializeCustomNEMToggle();
 		TextView multiplierView = (TextView) view.findViewById(R.id.material_load_multiplier);
 		multiplierView.setText(String.valueOf(multiplier));
 
@@ -107,10 +124,6 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			weightVolumeUnitSpinner.setSelection(row.isVolume() ? 1 : 0);
 		}
 
-		mValueView = (TextView) view.findViewById(R.id.material_load_value);
-		mTotalValueView = (TextView) view.findViewById(R.id.material_load_total_value);
-		mNEMView = (TextView) view.findViewById(R.id.material_load_nem);
-
 		EditText amountField = (EditText) view.findViewById(R.id.material_load_amount);
 		amountField.addTextChangedListener(new AmountChangedListener());
 		if (null != row) {
@@ -118,24 +131,6 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 			mAmount = row.getAmount();
 		}
 		mAmountRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
-
-		mCustomNEMField = (EditText) view.findViewById(R.id.material_load_custom_nem);
-		View customNEMHeading = view.findViewById(R.id.material_load_custom_nem_heading);
-		View customNEMLayout = view.findViewById(R.id.material_load_custom_nem_layout);
-		if (mMaterial.hasPresetNEMValue()) {
-			customNEMHeading.setVisibility(View.GONE);
-			customNEMLayout.setVisibility(View.GONE);
-			mCustomNEMRequiredMarker.setVisibility(View.GONE);
-		} else {
-			customNEMHeading.setVisibility(View.VISIBLE);
-			customNEMLayout.setVisibility(View.VISIBLE);
-			mCustomNEMRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
-			mCustomNEMField.addTextChangedListener(new CustomNEMChangedListener());
-			if (null != row && null != row.getCustomNEMmg()) {
-				mCustomNEMkg = row.getCustomNEMmg().divide(MG_PER_KG, 6, BigDecimal.ROUND_FLOOR);
-				mCustomNEMField.setText(mCustomNEMkg.stripTrailingZeros().toPlainString());
-			}
-		}
 
 		mNumberPkgsField = (EditText) view.findViewById(R.id.material_load_number_pkgs);
 		mTypePkgsField = (AutoCompleteTextView) view.findViewById(R.id.material_load_type_pkgs);
@@ -186,14 +181,17 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 
 	private void initializeFmSpinner(View view) {
 		mFmSpinner = (Spinner) view.findViewById(R.id.material_load_fm_spinner);
-		View fmHeading = view.findViewById(R.id.material_load_fm_heading);
 		List<Material.FM> fmEntries = mMaterial.getFM();
 
 		if (fmEntries.size() > 1) {
-			List<Material.FM> spinnerEntries = new ArrayList<>(fmEntries.size() + 1);
-			spinnerEntries.add(null);
-			spinnerEntries.addAll(fmEntries);
-			ArrayAdapter<Material.FM> adapter = new ArrayAdapter<Material.FM>(getContext(), R.layout.spinner_two_line_item, spinnerEntries) {
+			if (mCustomNEMMode) {
+				mSelectedFmIndex = -1;
+				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
+			} else if (mSelectedFmIndex < 0 || mSelectedFmIndex >= fmEntries.size()) {
+				mSelectedFmIndex = 0;
+				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
+			}
+			ArrayAdapter<Material.FM> adapter = new ArrayAdapter<Material.FM>(getContext(), R.layout.spinner_two_line_item, fmEntries) {
 				@NonNull
 				@Override
 				public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -214,45 +212,63 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 					Material.FM entry = getItem(position);
 					TextView line1 = (TextView) row.findViewById(R.id.fm_spinner_line1);
 					TextView line2 = (TextView) row.findViewById(R.id.fm_spinner_line2);
-					if (null == entry) {
-						if (null != line1) {
-							line1.setText(R.string.material_load_fm_none);
-						}
-						if (null != line2) {
-							line2.setText("");
-						}
-					} else {
-						if (null != line1) {
-							line1.setText(entry.getFbet() + " " + entry.getFben());
-						}
-						if (null != line2) {
-							BigDecimal nemKg = new BigDecimal(entry.getNEMmgAsInt()).divide(MG_PER_KG, 6, BigDecimal.ROUND_FLOOR);
-							line2.setText(getString(R.string.material_nem_kg_format, ValueHelper.formatValue(nemKg)));
-						}
+					if (null != line1) {
+						line1.setText(entry.getFbet() + " " + entry.getFben());
+					}
+					if (null != line2) {
+						BigDecimal nemKg = new BigDecimal(entry.getNEMmgAsInt()).divide(MG_PER_KG, 6, BigDecimal.ROUND_FLOOR);
+						line2.setText(getString(R.string.material_nem_kg_format, ValueHelper.formatValue(nemKg)));
 					}
 					return row;
 				}
 			};
 			mFmSpinner.setAdapter(adapter);
-			int initialSelection = (mSelectedFmIndex >= 0 && mSelectedFmIndex < fmEntries.size()) ? mSelectedFmIndex + 1 : 0;
+			int initialSelection = (mSelectedFmIndex >= 0 && mSelectedFmIndex < fmEntries.size()) ? mSelectedFmIndex : 0;
 			mFmSpinner.setSelection(initialSelection);
 			mFmSpinner.setOnItemSelectedListener(new FmSelectedListener());
-			fmHeading.setVisibility(View.VISIBLE);
-			mFmSpinner.setVisibility(View.VISIBLE);
-			mFmRequiredMarker.setVisibility(isClass1() ? View.VISIBLE : View.GONE);
 		} else {
 			if (1 == fmEntries.size()) {
 				mSelectedFmIndex = 0;
 				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
 			}
-			if (null != fmHeading) {
-				fmHeading.setVisibility(View.GONE);
-			}
-			if (null != mFmSpinner) {
-				mFmSpinner.setVisibility(View.GONE);
-			}
-			mFmRequiredMarker.setVisibility(View.GONE);
 		}
+		updateNemInputModeVisibility();
+	}
+
+	private void initializeCustomNEMInput(DocumentRow row) {
+		mCustomNEMField.addTextChangedListener(new CustomNEMChangedListener());
+		if (null != row && null != row.getCustomNEMmg()) {
+			mCustomNEMkg = row.getCustomNEMmg().divide(MG_PER_KG, 6, BigDecimal.ROUND_FLOOR);
+			mCustomNEMField.setText(mCustomNEMkg.stripTrailingZeros().toPlainString());
+		}
+		updateNemInputModeVisibility();
+	}
+
+	private void initializeCustomNEMToggle() {
+		if (!canToggleCustomNEMMode()) {
+			mCustomNEMToggle.setVisibility(View.GONE);
+			return;
+		}
+		mCustomNEMToggle.setVisibility(View.VISIBLE);
+		mCustomNEMToggle.setChecked(mCustomNEMMode);
+		mCustomNEMToggle.setOnCheckedChangeListener(new CustomNEMModeChangedListener());
+	}
+
+	private void updateNemInputModeVisibility() {
+		boolean showFm = mMaterial.getFM().size() > 1 && !mCustomNEMMode;
+		boolean showCustomNEM = canToggleCustomNEMMode() ? mCustomNEMMode : !mMaterial.hasPresetNEMValue();
+
+		mFmHeading.setVisibility(showFm ? View.VISIBLE : View.GONE);
+		mFmSpinner.setVisibility(showFm ? View.VISIBLE : View.GONE);
+		mFmRequiredMarker.setVisibility(showFm && isClass1() ? View.VISIBLE : View.GONE);
+
+		mCustomNEMHeading.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
+		mCustomNEMLayout.setVisibility(showCustomNEM ? View.VISIBLE : View.GONE);
+		mCustomNEMRequiredMarker.setVisibility(showCustomNEM && isClass1() ? View.VISIBLE : View.GONE);
+	}
+
+	private boolean canToggleCustomNEMMode() {
+		return isClass1() && mMaterial.getFM().size() > 1;
 	}
 
 	private void initializeMiljoCheckbox(DocumentRow row) {
@@ -269,6 +285,9 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	}
 
 	private void calculate() {
+		if (null == mNEMView || null == mValueView || null == mTotalValueView) {
+			return;
+		}
 		if (null == mAmount) {
 			mAmount = BigDecimal.ZERO;
 		}
@@ -294,9 +313,11 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	}
 
 	private BigDecimal getActiveNEMPerAmountKg() {
-		if (mMaterial.hasNEM()) {
+		if (mCustomNEMMode && null != mCustomNEMkg) {
+			return mCustomNEMkg;
+		} else if (mMaterial.hasNEM()) {
 			return mMaterial.getNEMkg();
-		} else if (null != mCustomNEMkg) {
+		} else if (!mMaterial.hasPresetNEMValue() && null != mCustomNEMkg) {
 			return mCustomNEMkg;
 		}
 		return null;
@@ -313,7 +334,10 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private final class FmSelectedListener implements AdapterView.OnItemSelectedListener {
 		@Override
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-			int selectedFmIndex = position - 1;
+			if (mCustomNEMMode) {
+				return;
+			}
+			int selectedFmIndex = position;
 			if (selectedFmIndex != mSelectedFmIndex) {
 				mSelectedFmIndex = selectedFmIndex;
 				mMaterial = mMaterial.withSelectedFmIndex(selectedFmIndex);
@@ -355,14 +379,16 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 	private final class SaveClickedListener implements DialogInterface.OnClickListener {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			DocumentRow row = new DocumentRow(mMaterial);
+			Material rowMaterial = mCustomNEMMode ? mMaterial.withSelectedFmIndex(-1) : mMaterial;
+			DocumentRow row = new DocumentRow(rowMaterial);
 
 			int numberPkgs = parseIntOrZero(mNumberPkgsField.getText().toString());
 			row.setNumberOfPackages(numberPkgs);
 			String typePkgs = mTypePkgsField.getText().toString().trim();
 			row.setTypeOfPackages(typePkgs);
 			row.setAmount(mAmount);
-			row.setCustomNEMmg(convertKgToMg(mCustomNEMkg));
+			BigDecimal customNEMmg = (mCustomNEMMode || !mMaterial.hasPresetNEMValue()) ? convertKgToMg(mCustomNEMkg) : null;
+			row.setCustomNEMmg(customNEMmg);
 			row.setWeightVolume(mWeightVolume);
 			row.setIsVolume(mWeightVolumeIsVolume);
 			if (null != mMiljoCheckbox && mMiljoCheckbox.getVisibility() == View.VISIBLE) {
@@ -426,6 +452,28 @@ public final class MaterialsLoadDialogFragment extends DialogFragment {
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 			BigDecimal parsed = ValueHelper.parseValue(s.toString());
 			mCustomNEMkg = (parsed.compareTo(BigDecimal.ZERO) > 0) ? parsed : null;
+			calculate();
+		}
+	}
+
+	private final class CustomNEMModeChangedListener implements CompoundButton.OnCheckedChangeListener {
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			mCustomNEMMode = isChecked;
+			if (mCustomNEMMode) {
+				mSelectedFmIndex = -1;
+				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
+			} else {
+				List<Material.FM> fmEntries = mMaterial.getFM();
+				if (!fmEntries.isEmpty() && (mSelectedFmIndex < 0 || mSelectedFmIndex >= fmEntries.size())) {
+					mSelectedFmIndex = 0;
+				}
+				mMaterial = mMaterial.withSelectedFmIndex(mSelectedFmIndex);
+				if (null != mFmSpinner && mSelectedFmIndex >= 0) {
+					mFmSpinner.setSelection(mSelectedFmIndex);
+				}
+			}
+			updateNemInputModeVisibility();
 			calculate();
 		}
 	}

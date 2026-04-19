@@ -118,9 +118,9 @@
 	<string name="material_load_value">Värde:</string>
 	<string name="material_load_weight_volume">Vikt/volym:</string>
 	<string name="material_load_nem_custom">NEM per styck:</string>
+	<string name="material_load_custom_nem_toggle">Eget NEM-värde</string>
 	<string name="material_load_miljo">Miljöfarligt</string>
 	<string name="material_load_fm">FM:</string>
-	<string name="material_load_fm_none">Ingen vald</string>
 
     <string name="materials_list_empty">Inget funnet.</string>
     <string name="materials_nav_title">Materiel</string>
