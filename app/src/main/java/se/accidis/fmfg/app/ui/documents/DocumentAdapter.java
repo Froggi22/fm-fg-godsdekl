@@ -341,6 +341,8 @@ public final class DocumentAdapter extends BaseAdapter {
 		boolean isViolatingColoadingRules = ColoadingHelper.isViolationOfColoadingRules(mDocument);
 		View warningClass1View = view.findViewById(R.id.document_warning_class1);
 		warningClass1View.setVisibility(isViolatingColoadingRules ? View.VISIBLE : View.GONE);
+		TextView warningClass1Line2View = (TextView) view.findViewById(R.id.document_warning_class1_line2);
+		warningClass1Line2View.setText(ColoadingHelper.getColoadingWarningText(mDocument, mContext));
 
 		return view;
 	}

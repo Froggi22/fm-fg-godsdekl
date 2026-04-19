@@ -115,7 +115,8 @@
             android:text="@string/document_warning_class1_line1"/>
 
         <TextView
-            style="@style/DocumentNoticeText"
+            android:id="@+id/document_warning_class1_line2"
+            style="@style/DocumentWarningText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/document_warning_class1_line1"
