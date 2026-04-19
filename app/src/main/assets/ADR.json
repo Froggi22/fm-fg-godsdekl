@@ -377,6 +377,16 @@
         "Fbet": "M4005-206300",
         "Fben": "5,56/5 STKPRJ",
         "NEMmg": 1500
+      },
+      {
+        "Fbet": "M4005-209910",
+        "Fben": "5,56 LÖS PTR 5B",
+        "NEMmg": 600
+      },
+      {
+        "Fbet": "M4007-509900",
+        "Fben": "7,62 LÖS PTR 10",
+        "NEMmg": 1400
       }
     ],
     "Miljo": false,
@@ -5174,6 +5184,11 @@
     ],
     "FarlNr": null,
     "FM": [
+	  {
+        "Fbet": "M4747-400011",
+        "Fben": "R\u00d6KSTAV 10",
+        "NEMmg": 51000
+      },
       {
         "Fbet": "M4747-400001",
         "Fben": "R\u00d6KSTAV 52",
@@ -14055,7 +14070,7 @@
       {
         "Fbet": "M4747-200601",
         "Fben": "KREVADPTR 6",
-        "NEMmg": 35000
+        "NEMmg": 22900
       },
       {
         "Fbet": "M4747-131001",
