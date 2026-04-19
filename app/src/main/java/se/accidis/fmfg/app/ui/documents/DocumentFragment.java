@@ -1,8 +1,10 @@
 package se.accidis.fmfg.app.ui.documents;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -167,9 +169,7 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 				return true;
 
 			case R.id.document_menu_export:
-				final ProgressDialog progressDialog = ProgressDialog.show(getContext(), getString(R.string.document_export), getString(R.string.document_export_please_wait), true, false);
-				final ExportPdfAsyncTask exportTask = new ExportPdfAsyncTask(getActivity(), progressDialog);
-				exportTask.execute();
+				startPdfExportWithAdrLimitWarning();
 				return true;
 
 			case R.id.document_menu_opt_fields:
@@ -266,6 +266,30 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 			mAdapter.setIsCurrentDocument(true);
 			mButtonBar.setVisibility(mIsCurrentDocument ? View.VISIBLE : View.GONE);
 		}
+	}
+
+	private void startPdfExportWithAdrLimitWarning() {
+		if (mDocument.hasTotalValueAboveAdrLimit()) {
+			new AlertDialog.Builder(getActivity())
+				.setMessage(R.string.document_export_warning_total_value)
+				.setPositiveButton(R.string.document_export_warning_total_value_continue, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startPdfExport();
+					}
+				})
+				.setNegativeButton(R.string.generic_cancel, null)
+				.show();
+			return;
+		}
+
+		startPdfExport();
+	}
+
+	private void startPdfExport() {
+		final ProgressDialog progressDialog = ProgressDialog.show(getContext(), getString(R.string.document_export), getString(R.string.document_export_please_wait), true, false);
+		final ExportPdfAsyncTask exportTask = new ExportPdfAsyncTask(getActivity(), progressDialog);
+		exportTask.execute();
 	}
 
 	private void updateMainView() {

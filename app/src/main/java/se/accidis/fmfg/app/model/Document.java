@@ -24,6 +24,7 @@ import se.accidis.fmfg.app.utils.JSONUtils;
  * Model object for transport documents.
  */
 public final class Document {
+	private static final BigDecimal ADR_LIMIT_TOTAL_VALUE = new BigDecimal(1000);
 	private final List<DocumentRow> mRows = new ArrayList<>();
 	private String mAuthor;
 	private boolean mHasUnsavedChanges;
@@ -248,6 +249,10 @@ public final class Document {
 
 	public boolean hasOptionalFields() {
 		return isProtectedTransportSpecified() || !TextUtils.isEmpty(mVehicleReg) || !TextUtils.isEmpty(mVehicleType);
+	}
+
+	public boolean hasTotalValueAboveAdrLimit() {
+		return getCalculatedTotalValue().compareTo(ADR_LIMIT_TOTAL_VALUE) > 0;
 	}
 
 	public boolean hasUnsavedChanges() {
