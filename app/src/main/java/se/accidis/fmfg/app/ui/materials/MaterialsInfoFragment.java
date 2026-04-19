@@ -151,7 +151,7 @@ public final class MaterialsInfoFragment extends Fragment implements MainActivit
 
 		for (Integer label : labels) {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(size, size);
-			layoutParams.setMargins(0, 0, 0, margin);
+			layoutParams.setMargins(0, 0, margin, margin);
 
 			ImageView imageView = new ImageView(context);
 			imageView.setLayoutParams(layoutParams);

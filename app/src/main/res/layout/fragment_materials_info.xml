@@ -64,15 +64,13 @@
                 android:id="@+id/material_layout_labels"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:orientation="vertical">
+                android:orientation="horizontal">
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
-                android:layout_toLeftOf="@id/material_layout_labels"
+                android:layout_below="@id/material_layout_labels"
                 android:orientation="vertical">
 
                 <TableLayout
