@@ -116,14 +116,7 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 		int type = mAdapter.getItemViewType(position);
 
 		if (DocumentAdapter.VIEW_TYPE_ADDRESS == type) {
-			Bundle args = new Bundle();
-			args.putInt(AddressDialogFragment.ARG_POSITION, position);
-			args.putString(AddressDialogFragment.ARG_CURRENT_ADDRESS, mAdapter.getAddressTextByPosition(position));
-
-			AddressDialogFragment dialog = new AddressDialogFragment();
-			dialog.setArguments(args);
-			dialog.setDialogListener(new AddressDialogListener(position));
-			dialog.show(getFragmentManager(), AddressDialogFragment.class.getSimpleName());
+			showAddressDialog(DocumentAdapter.AUTHOR_POSITION);
 
 		} else if (DocumentAdapter.VIEW_TYPE_ROW == type) {
 			DocumentRow row = (DocumentRow) mAdapter.getItem(position);
@@ -251,6 +244,12 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 		mAdapter = new DocumentAdapter(getContext(), mDocument, mIsCurrentDocument);
 		mAdapter.setShowFbet(mPrefs.shouldShowFbetInDocument());
 		mAdapter.setShowAuthor(mPrefs.shouldShowAuthorInDocument());
+		mAdapter.setAddressClickListener(new DocumentAdapter.AddressClickListener() {
+			@Override
+			public void onAddressClick(int addressPosition) {
+				showAddressDialog(addressPosition);
+			}
+		});
 		setListAdapter(mAdapter);
 
 		if (null != mListState) {
@@ -266,6 +265,21 @@ public final class DocumentFragment extends ListFragment implements MainActivity
 			mAdapter.setIsCurrentDocument(true);
 			mButtonBar.setVisibility(mIsCurrentDocument ? View.VISIBLE : View.GONE);
 		}
+	}
+
+	private void showAddressDialog(int addressPosition) {
+		if (null == mAdapter || !mIsCurrentDocument) {
+			return;
+		}
+
+		Bundle args = new Bundle();
+		args.putInt(AddressDialogFragment.ARG_POSITION, addressPosition);
+		args.putString(AddressDialogFragment.ARG_CURRENT_ADDRESS, mAdapter.getAddressTextByPosition(addressPosition));
+
+		AddressDialogFragment dialog = new AddressDialogFragment();
+		dialog.setArguments(args);
+		dialog.setDialogListener(new AddressDialogListener(addressPosition));
+		dialog.show(getFragmentManager(), AddressDialogFragment.class.getSimpleName());
 	}
 
 	private void startPdfExportWithAdrLimitWarning() {

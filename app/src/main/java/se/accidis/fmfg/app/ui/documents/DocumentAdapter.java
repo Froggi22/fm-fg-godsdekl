@@ -33,13 +33,16 @@ public final class DocumentAdapter extends BaseAdapter {
 	public static final int RECIPIENT_POSITION = 1;
 	public static final int SENDER_POSITION = 0;
 	public static final int VIEW_TYPE_ADDRESS = 1;
+	public static final int VIEW_TYPE_ADDRESS_PAIR = 5;
 	public static final int VIEW_TYPE_EMPTY = 4;
 	public static final int VIEW_TYPE_INFO = 2;
 	public static final int VIEW_TYPE_ROW = 0;
 	public static final int VIEW_TYPE_SEPARATOR = 3;
-	private static final int ROW_BASE_TOP_OFFSET = 3;
+	private static final int AUTHOR_LIST_POSITION = 1;
+	private static final int ROW_BASE_TOP_OFFSET = 2;
 	private static final int ROW_BOTTOM_OFFSET = 2;
 	private static final String LABEL_61 = "6.1";
+	private AddressClickListener mAddressClickListener;
 	private final Context mContext;
 	private final LayoutInflater mInflater;
 	private Document mDocument;
@@ -100,9 +103,13 @@ public final class DocumentAdapter extends BaseAdapter {
 		if (position == mRowTopOffset - 1 || position == mRowTopOffset + numRows) {
 			// There is a separator between the addresses and the list, and another between the list and the summary
 			return VIEW_TYPE_SEPARATOR;
+		} else if (SENDER_POSITION == position) {
+			return VIEW_TYPE_ADDRESS_PAIR;
+		} else if (mShowAuthor && AUTHOR_LIST_POSITION == position) {
+			return VIEW_TYPE_ADDRESS;
 		} else if (position < mRowTopOffset) {
 			// Above the list are addresses
-			return VIEW_TYPE_ADDRESS;
+			return VIEW_TYPE_SEPARATOR;
 		} else if (position >= mRowTopOffset + numRows) {
 			// Below the list is the summary
 			return VIEW_TYPE_INFO;
@@ -118,8 +125,10 @@ public final class DocumentAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		switch (getItemViewType(position)) {
+			case VIEW_TYPE_ADDRESS_PAIR:
+				return getAddressPairView(convertView, parent);
 			case VIEW_TYPE_ADDRESS:
-				return getAddressView(position, convertView, parent);
+				return getAddressView(AUTHOR_POSITION, convertView, parent);
 			case VIEW_TYPE_EMPTY:
 				return getEmptyView(convertView, parent);
 			case VIEW_TYPE_INFO:
@@ -135,7 +144,7 @@ public final class DocumentAdapter extends BaseAdapter {
 
 	@Override
 	public int getViewTypeCount() {
-		return 5;
+		return 6;
 	}
 
 	@Override
@@ -144,7 +153,7 @@ public final class DocumentAdapter extends BaseAdapter {
 			return false;
 		} else {
 			int type = getItemViewType(position);
-			return (VIEW_TYPE_INFO != type && VIEW_TYPE_SEPARATOR != type && VIEW_TYPE_EMPTY != type);
+			return (VIEW_TYPE_INFO != type && VIEW_TYPE_SEPARATOR != type && VIEW_TYPE_EMPTY != type && VIEW_TYPE_ADDRESS_PAIR != type);
 		}
 	}
 
@@ -152,6 +161,10 @@ public final class DocumentAdapter extends BaseAdapter {
 		mDocument = document;
 		mRows = document.getRows();
 		notifyDataSetChanged();
+	}
+
+	public void setAddressClickListener(AddressClickListener listener) {
+		mAddressClickListener = listener;
 	}
 
 	public void setIsCurrentDocument(boolean value) {
@@ -212,6 +225,63 @@ public final class DocumentAdapter extends BaseAdapter {
 		}
 
 		return view;
+	}
+
+	private View getAddressPairView(View convertView, ViewGroup parent) {
+		View view;
+		if (null == convertView) {
+			view = mInflater.inflate(R.layout.list_item_document_address_pair, parent, false);
+		} else {
+			view = convertView;
+		}
+
+		populateAddressColumn(
+			view.findViewById(R.id.document_sender_container),
+			(TextView) view.findViewById(R.id.document_sender_heading),
+			(TextView) view.findViewById(R.id.document_sender_text),
+			SENDER_POSITION);
+		populateAddressColumn(
+			view.findViewById(R.id.document_recipient_container),
+			(TextView) view.findViewById(R.id.document_recipient_heading),
+			(TextView) view.findViewById(R.id.document_recipient_text),
+			RECIPIENT_POSITION);
+
+		return view;
+	}
+
+	private void populateAddressColumn(View container, TextView headingText, TextView addressText, final int addressPosition) {
+		headingText.setText(getAddressHeadingByPosition(addressPosition));
+		String text = getAddressTextByPosition(addressPosition);
+
+		if (TextUtils.isEmpty(text)) {
+			if (mIsCurrentDocument) {
+				addressText.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(mContext, R.drawable.ic_create_small), null, null, null);
+				addressText.setText(R.string.document_tap_to_edit_address);
+			} else {
+				addressText.setCompoundDrawables(null, null, null, null);
+				addressText.setText(R.string.document_no_data);
+			}
+		} else {
+			addressText.setCompoundDrawables(null, null, null, null);
+			addressText.setText(text);
+		}
+
+		if (mIsCurrentDocument) {
+			container.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (null != mAddressClickListener) {
+						mAddressClickListener.onAddressClick(addressPosition);
+					}
+				}
+			});
+			container.setClickable(true);
+			container.setFocusable(true);
+		} else {
+			container.setOnClickListener(null);
+			container.setClickable(false);
+			container.setFocusable(false);
+		}
 	}
 
 	private View getEmptyView(View convertView, ViewGroup parent) {
@@ -342,5 +412,9 @@ public final class DocumentAdapter extends BaseAdapter {
 
 	private View getSeparatorView(View convertView, ViewGroup parent) {
 		return (null != convertView ? convertView : mInflater.inflate(R.layout.list_item_document_separator, parent, false));
+	}
+
+	public interface AddressClickListener {
+		void onAddressClick(int addressPosition);
 	}
 }
