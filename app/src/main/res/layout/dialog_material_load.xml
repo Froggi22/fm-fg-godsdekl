@@ -291,7 +291,16 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/material_load_custom_nem_unit_package" />
-		</RadioGroup>
+	</RadioGroup>
+
+		<CheckBox
+			android:id="@+id/material_load_miljo"
+			android:layout_column="0"
+			android:layout_columnSpan="2"
+			android:layout_marginTop="10dp"
+			android:layout_row="9"
+			android:text="@string/material_load_miljo"
+			android:visibility="gone" />
 
 		<View
 			android:layout_width="match_parent"
@@ -300,7 +309,7 @@
 			android:layout_columnSpan="2"
 			android:layout_marginBottom="8dp"
 			android:layout_marginTop="12dp"
-			android:layout_row="9"
+			android:layout_row="10"
 			android:background="#33000000" />
 
 		<TextView
@@ -308,7 +317,7 @@
 			style="@style/MaterialLoadDialogLabelHeading"
 			android:layout_column="0"
 			android:layout_marginTop="2dp"
-			android:layout_row="10"
+			android:layout_row="11"
 			android:text="@string/material_load_nem" />
 
 		<TextView
@@ -316,51 +325,42 @@
 			style="@style/MaterialLoadDialogLabel"
 			android:layout_column="1"
 			android:layout_marginTop="2dp"
-			android:layout_row="10" />
+			android:layout_row="11" />
 
 		<TextView
 			style="@style/MaterialLoadDialogSubLabelHeading"
 			android:layout_column="0"
-			android:layout_row="11"
+			android:layout_row="12"
 			android:text="@string/material_load_multiplier" />
 
 		<TextView
 			android:id="@+id/material_load_multiplier"
 			style="@style/MaterialLoadDialogSubLabel"
 			android:layout_column="1"
-			android:layout_row="11" />
+			android:layout_row="12" />
 
 		<TextView
 			style="@style/MaterialLoadDialogLabelHeading"
 			android:layout_column="0"
-			android:layout_row="12"
+			android:layout_row="13"
 			android:text="@string/material_load_value" />
 
 		<TextView
 			android:id="@+id/material_load_value"
 			style="@style/MaterialLoadDialogLabel"
 			android:layout_column="1"
-			android:layout_row="12" />
+			android:layout_row="13" />
 
 		<TextView
 			style="@style/MaterialLoadDialogSubLabelHeading"
 			android:layout_column="0"
-			android:layout_row="13"
+			android:layout_row="14"
 			android:text="@string/material_load_total_value" />
 
 		<TextView
 			android:id="@+id/material_load_total_value"
 			style="@style/MaterialLoadDialogSubLabel"
 			android:layout_column="1"
-			android:layout_row="13" />
-
-		<CheckBox
-			android:id="@+id/material_load_miljo"
-			android:layout_column="0"
-			android:layout_columnSpan="2"
-			android:layout_marginTop="10dp"
-			android:layout_row="14"
-			android:text="@string/material_load_miljo"
-			android:visibility="gone" />
+			android:layout_row="14" />
 	</GridLayout>
 </ScrollView>
